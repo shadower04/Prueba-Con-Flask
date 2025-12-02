@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Contacto - El Golazo{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Contacto</h1>
+        <p>Estamos aquí para ayudarte. ¡Contáctanos!</p>
+    </div>
+</div>
+
+<div class="container">
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; margin-bottom: 3rem;">
+        <!-- Información de Contacto -->
+        <div class="content-section">
+            <h2 style="color: #2a5298; margin-bottom: 2rem;">📞 Nuestra Información</h2>
+            
+            <div style="margin-bottom: 2rem;">
+                <h3 style="color: #ff6b35; margin-bottom: 1rem;">📍 Dirección</h3>
+                <p>Av. del Fútbol 1234<br>Buenos Aires, Argentina</p>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="color: #ff6b35; margin-bottom: 1rem;">📞 Teléfonos</h3>
+                <p>Reservas: (011) 1234-5678<br>
+                   Administración: (011) 9876-5432</p>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="color: #ff6b35; margin-bottom: 1rem;">✉️ Email</h3>
+                <p>reservas@elgolazo.com<br>
+                   info@elgolazo.com</p>
+            </div>
+
+            <div style="margin-bottom: 2rem;">
+                <h3 style="color: #ff6b35; margin-bottom: 1rem;">🕒 Horarios</h3>
+                <p>Lunes a Viernes: 8:00 - 24:00<br>
+                   Sábados y Domingos: 8:00 - 02:00</p>
+            </div>
+        </div>
+
+        <!-- Formulario de Contacto -->
+        <div class="content-section">
+            <h2 style="color: #2a5298; margin-bottom: 2rem;">📝 Envíanos un Mensaje</h2>
+            
+            <form id="contactoForm">
+                <div class="form-group">
+                    <label for="nombreContacto">Nombre Completo *</label>
+                    <input type="text" id="nombreContacto" name="nombreContacto" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailContacto">Email *</label>
+                    <input type="email" id="emailContacto" name="emailContacto" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefonoContacto">Teléfono</label>
+                    <input type="tel" id="telefonoContacto" name="telefonoContacto">
+                </div>
+
+                <div class="form-group">
+                    <label for="asunto">Asunto *</label>
+                    <select id="asunto" name="asunto" required>
+                        <option value="">Seleccionar asunto</option>
+                        <option value="reserva">Consulta sobre Reservas</option>
+                        <option value="precios">Consulta de Precios</option>
+                        <option value="eventos">Eventos Corporativos</option>
+                        <option value="problema">Reportar Problema</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="mensaje">Mensaje *</label>
+                    <textarea id="mensaje" name="mensaje" rows="5" required></textarea>
+                </div>
+
+                <button type="submit" class="btn">Enviar Mensaje</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Mapa -->
+    <div class="content-section">
+        <h2 style="color: #2a5298; margin-bottom: 2rem; text-align: center;">🗺️ ¿Dónde Estamos?</h2>
+        <div style="background: #f8f9fa; padding: 2rem; border-radius: 10px; text-align: center;">
+            <p style="margin-bottom: 1rem; font-size: 1.1rem;">📍 Av. del Fútbol 1234, Buenos Aires</p>
+            <div style="background: #e9ecef; padding: 3rem; border-radius: 5px; margin-top: 1rem;">
+                <p style="color: #666; font-style: italic;">[Mapa interactivo se cargaría aquí]</p>
+                <p style="color: #888; margin-top: 1rem;">🌍 Google Maps | 🍎 Apple Maps</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('contactoForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('¡Mensaje enviado con éxito! Te contactaremos pronto.');
+        this.reset();
+    });
+</script>
+{% endblock %}

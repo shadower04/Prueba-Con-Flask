@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Disponibilidad - El Golazo{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Disponibilidad de Canchas</h1>
+        <p>Consulta los horarios disponibles para reservar</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content-section">
+        <div class="form-group">
+            <label for="fechaConsulta">Seleccionar Fecha:</label>
+            <input type="date" id="fechaConsulta" name="fechaConsulta" value="{{ fecha_hoy }}">
+        </div>
+
+        <div id="loading" style="display: none; text-align: center; padding: 2rem;">
+            <p>Cargando disponibilidad...</p>
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table id="tablaDisponibilidad" style="width: 100%; border-collapse: collapse; margin-top: 2rem;">
+                <thead>
+                    <tr style="background: #2a5298; color: white;">
+                        <th style="padding: 1rem; text-align: left;">Hora</th>
+                        <th style="padding: 1rem; text-align: center;">Cancha 1</th>
+                        <th style="padding: 1rem; text-align: center;">Cancha 2</th>
+                        <th style="padding: 1rem; text-align: center;">Cancha 3</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpoTabla">
+                    <!-- La tabla se cargará con JavaScript -->
+                </tbody>
+            </table>
+        </div>
+
+        <div style="margin-top: 2rem; text-align: center;">
+            <a href="{{ url_for('reservas') }}" class="btn">Reservar Ahora</a>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para confirmar reserva -->
+<div id="modalReserva" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; width: 400px; max-width: 90%;">
+        <h3 style="margin-bottom: 1rem;">Confirmar Reserva</h3>
+        <p id="detalleReserva" style="margin-bottom: 1.5rem;"></p>
+        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+            <button id="cancelarReserva" class="btn" style="background: #6c757d;">Cancelar</button>
+            <button id="confirmarReserva" class="btn">Confirmar Reserva</button>
+        </div>
+    </div>
+</div>
+
+<script>
+// Variables globales
+let reservaActual = { hora: null, cancha: null, celdaId: null };
+const horarios = ['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00', '18:00-19:00'];
+
+// Cuando la página carga
+document.addEventListener('DOMContentLoaded', function() {
+    console.log("🔄 Inicializando página de disponibilidad...");
+    cargarDisponibilidad();
+    
+    document.getElementById('fechaConsulta').addEventListener('change', function() {
+        console.log("📅 Cambio de fecha:", this.value);
+        cargarDisponibilidad();
+    });
+    
+    document.getElementById('cancelarReserva').addEventListener('click', cerrarModal);
+    document.getElementById('confirmarReserva').addEventListener('click', confirmarReserva);
+});
+
+// Cargar disponibilidad
+function cargarDisponibilidad() {
+    const fecha = document.getElementById('fechaConsulta').value;
+    const loading = document.getElementById('loading');
+    const tabla = document.getElementById('cuerpoTabla');
+    
+    console.log("🔄 Cargando disponibilidad para:", fecha);
+    
+    loading.style.display = 'block';
+    tabla.innerHTML = '';
+    
+    fetch(`/api/disponibilidad?fecha=${fecha}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            return response.json();
+        })
+        .then(data => {
+            console.log("📊 Datos recibidos:", data);
+            if (data.success) {
+                renderizarTabla(data.ocupadas || {});
+            } else {
+                console.error("❌ Error del servidor:", data.error);
+                renderizarTabla({});
+            }
+        })
+        .catch(error => {
+            console.error("❌ Error fetching:", error);
+            alert('Error al cargar la disponibilidad');
+            renderizarTabla({});
+        })
+        .finally(() => {
+            loading.style.display = 'none';
+        });
+}
+
+// Renderizar tabla
+function renderizarTabla(ocupadas) {
+    const tabla = document.getElementById('cuerpoTabla');
+    let html = '';
+    
+    console.log("🎨 Renderizando tabla con ocupadas:", ocupadas);
+    
+    horarios.forEach((horario, index) => {
+        const horaId = index + 1;
+        html += `<tr style="border-bottom: 1px solid #ddd;">`;
+        html += `<td style="padding: 1rem; font-weight: bold;">${horario.replace('-', ' - ')}</td>`;
+        
+        for (let cancha = 1; cancha <= 3; cancha++) {
+            const celdaId = `celda-${horaId}-${cancha}`;
+            const canchaStr = cancha.toString();
+            const estaOcupada = ocupadas[horario] && ocupadas[horario].includes(canchaStr);
+            
+            if (estaOcupada) {
+                html += `
+                    <td id="${celdaId}" class="celda-ocupada" style="padding: 1rem; text-align: center;">
+                        <span style="background: #f8d7da; padding: 5px 10px; border-radius: 4px; display: inline-block;">❌ Ocupada</span>
+                    </td>
+                `;
+            } else {
+                html += `
+                    <td id="${celdaId}" class="celda-disponible" 
+                        data-hora="${horario}" data-cancha="${cancha}"
+                        style="padding: 1rem; text-align: center; cursor: pointer;"
+                        onclick="reservarCancha('${horario}', ${cancha}, '${celdaId}')">
+                        <span style="background: #d4edda; padding: 5px 10px; border-radius: 4px; display: inline-block;">✅ Disponible</span>
+                    </td>
+                `;
+            }
+        }
+        html += `</tr>`;
+    });
+    
+    tabla.innerHTML = html;
+    console.log("✅ Tabla renderizada");
+}
+
+// Función para reservar
+function reservarCancha(hora, cancha, celdaId) {
+    console.log("🔄 Iniciando reserva:", {hora, cancha, celdaId});
+    
+    reservaActual = { hora, cancha, celdaId };
+    
+    const modal = document.getElementById('modalReserva');
+    const detalle = document.getElementById('detalleReserva');
+    
+    detalle.textContent = `¿Confirmar reserva para Cancha ${cancha} en el horario ${hora.replace('-', ' - ')}?`;
+    modal.style.display = 'block';
+}
+
+function cerrarModal() {
+    document.getElementById('modalReserva').style.display = 'none';
+    reservaActual = { hora: null, cancha: null, celdaId: null };
+}
+
+function confirmarReserva() {
+    if (!reservaActual.celdaId) return;
+    
+    const fecha = document.getElementById('fechaConsulta').value;
+    console.log("✅ Confirmando reserva:", {...reservaActual, fecha});
+    
+    fetch('/reservar', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            hora: reservaActual.hora,
+            cancha: reservaActual.cancha,
+            fecha: fecha
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("📨 Respuesta del servidor:", data);
+        if (data.success) {
+            alert('✅ ' + data.message);
+            // Recargar la disponibilidad para ver los cambios
+            cargarDisponibilidad();
+        } else {
+            alert('❌ ' + data.message);
+        }
+        cerrarModal();
+    })
+    .catch(error => {
+        console.error('❌ Error:', error);
+        alert('❌ Error al realizar la reserva');
+        cerrarModal();
+    });
+}
+
+// Cerrar modal al hacer clic fuera
+window.addEventListener('click', function(event) {
+    const modal = document.getElementById('modalReserva');
+    if (event.target === modal) {
+        cerrarModal();
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Reservas - El Golazo{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div class="container">
+        <h1>Reservar Cancha</h1>
+        <p>Completa el formulario para reservar tu cancha preferida</p>
+    </div>
+</div>
+
+<div class="container">
+    <div class="content-section">
+        <form id="reservaForm">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h3 style="color: #2a5298; margin-bottom: 1.5rem;">Información Personal</h3>
+                    
+                    <div class="form-group">
+                        <label for="nombre">Nombre Completo *</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="telefono">Teléfono *</label>
+                        <input type="tel" id="telefono" name="telefono" required>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color: #2a5298; margin-bottom: 1.5rem;">Detalles de la Reserva</h3>
+
+                    <div class="form-group">
+                        <label for="cancha">Cancha *</label>
+                        <select id="cancha" name="cancha" required>
+                            <option value="">Seleccionar cancha</option>
+                            <option value="1">Cancha 1 - Principal</option>
+                            <option value="2">Cancha 2 - Lateral</option>
+                            <option value="3">Cancha 3 - Profesional</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fecha">Fecha *</label>
+                        <input type="date" id="fecha" name="fecha" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="hora">Hora *</label>
+                        <select id="hora" name="hora" required>
+                            <option value="">Seleccionar hora</option>
+                            <option value="18:00">14:00 - 15:00</option>
+                            <option value="18:00">15:00 - 16:00</option>
+                            <option value="18:00">16:00 - 17:00</option>
+                            <option value="18:00">17:00 - 18:00</option>
+                            <option value="18:00">18:00 - 19:00</option>
+                            <option value="19:00">19:00 - 20:00</option>
+                            <option value="20:00">20:00 - 21:00</option>
+                            <option value="21:00">21:00 - 22:00</option>
+                            <option value="22:00">22:00 - 23:00</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="duracion">Duración</label>
+                        <select id="duracion" name="duracion">
+                            <option value="1">1 hora - $2500</option>
+                            <option value="2">2 horas - $4500</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 2rem;">
+                <button type="submit" class="btn">Confirmar Reserva</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.getElementById('reservaForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        alert('¡Reserva realizada con éxito! Te contactaremos para confirmar.');
+        this.reset();
+    });
+
+    // Set minimum date to today
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('fecha').min = today;
+</script>
+{% endblock %}
