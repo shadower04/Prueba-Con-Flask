@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Login Admin{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 400px; margin-top: 3rem;">
+    <h2 style="text-align:center; margin-bottom: 2rem;">Acceso Administración</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <label>Usuario</label>
+        <input type="text" name="usuario" class="form-control" required>
+
+        <label style="margin-top:1rem;">Contraseña</label>
+        <input type="password" name="password" class="form-control" required>
+
+        <button class="btn" style="width:100%; margin-top:1.5rem;">Ingresar</button>
+
+        {% if messages %}
+            <div style="margin-top:1rem; color:red;">
+                {% for m in messages %}
+                    {{ m }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </form>
+</div>
+{% endblock %}

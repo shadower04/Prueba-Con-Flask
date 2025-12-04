@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Panel Administración{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div class="container">
+        <h1>Panel de Administración</h1>
+        <p>Gestión completa del sistema de reservas</p>
+    </div>
+</div>
+
+<div class="container">
+
+    <!-- Estadísticas -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+        
+        <div style="background:white; padding:1.5rem; border-radius:10px; text-align:center;">
+            <h3>{{ total_reservas }}</h3>
+            <p>Total Reservas</p>
+        </div>
+
+        <div style="background:white; padding:1.5rem; border-radius:10px; text-align:center;">
+            <h3>3</h3>
+            <p>Canchas Activas</p>
+        </div>
+
+        <div style="background:white; padding:1.5rem; border-radius:10px; text-align:center;">
+            <h3>${{ ingresos }}</h3>
+            <p>Ingresos Estimados</p>
+        </div>
+
+        <div style="background:white; padding:1.5rem; border-radius:10px; text-align:center;">
+            <h3>{{ tasa_confirm }}%</h3>
+            <p>Tasa de Confirmación</p>
+        </div>
+    </div>
+
+
+    <!-- LISTA DE RESERVAS -->
+    <div class="content-section">
+        <h2 style="color:#2a5298; margin-bottom:1.5rem;">📋 Todas las Reservas</h2>
+
+        {% if reservas %}
+        <table style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr style="background:#2a5298; color:white;">
+                    <th style="padding:1rem;">Cliente</th>
+                    <th style="padding:1rem;">Cancha</th>
+                    <th style="padding:1rem;">Fecha / Hora</th>
+                    <th style="padding:1rem;">Estado</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for r in reservas %}
+                <tr style="border-bottom:1px solid #ccc;">
+                    <td style="padding:1rem;">
+                        <strong>{{ r.nombre }}</strong><br>
+                        <small>{{ r.email }}</small><br>
+                        <small>{{ r.telefono }}</small>
+                    </td>
+
+                    <td style="padding:1rem; text-align:center;">
+                        Cancha {{ r.cancha }}
+                    </td>
+
+                    <td style="padding:1rem; text-align:center;">
+                        {{ r.fecha }}<br>
+                        <small>{{ r.hora }}</small>
+                    </td>
+
+                    <td style="padding:1rem; text-align:center;">
+                        {% if r.estado == 'confirmada' %}
+                            <span style="background:#d4edda; color:#155724; padding:5px 10px; border-radius:10px;">Confirmada</span>
+                        {% elif r.estado == 'pendiente' %}
+                            <span style="background:#fff3cd; color:#856404; padding:5px 10px; border-radius:10px;">Pendiente</span>
+                        {% else %}
+                            <span style="background:#f8d7da; color:#721c24; padding:5px 10px; border-radius:10px;">Cancelada</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% else %}
+        <p style="text-align:center;">No hay reservas registradas.</p>
+        {% endif %}
+
+    </div>
+</div>
+
+{% endblock %}
