@@ -1,100 +1,707 @@
+<!-- templates/reservas.html -->
 {% extends "base.html" %}
 
-{% block title %}Reservas - El Golazo{% endblock %}
+{% block title %}Reservar Cancha - El Golazo{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<!-- Page Header -->
+<section class="page-header">
     <div class="container">
         <h1>Reservar Cancha</h1>
         <p>Completa el formulario para reservar tu cancha preferida</p>
     </div>
-</div>
+</section>
 
-<div class="container">
-    <div class="content-section">
-        <form id="reservaForm">
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
-                <div>
-                    <h3 style="color: #2a5298; margin-bottom: 1.5rem;">Información Personal</h3>
+<!-- Reservation Form -->
+<section class="reservation-section">
+    <div class="container">
+        <div class="reservation-container">
+            <!-- Form Column -->
+            <div class="form-column">
+                <div class="form-section">
+                    <h2><i class="fas fa-user-circle"></i> Información Personal</h2>
                     
-                    <div class="form-group">
-                        <label for="nombre">Nombre Completo *</label>
-                        <input type="text" id="nombre" name="nombre" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Email *</label>
-                        <input type="email" id="email" name="email" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="telefono">Teléfono *</label>
-                        <input type="tel" id="telefono" name="telefono" required>
-                    </div>
+                    <form id="reservationForm" method="POST" action="{% url 'reservas' %}">
+                        {% csrf_token %}
+                        
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="nombre_completo">
+                                    <i class="fas fa-user"></i> Nombre Completo *
+                                </label>
+                                <input type="text" id="nombre_completo" name="nombre_completo" required 
+                                       placeholder="Ingresa tu nombre completo">
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">
+                                    <i class="fas fa-envelope"></i> Email *
+                                </label>
+                                <input type="email" id="email" name="email" required 
+                                       placeholder="ejemplo@correo.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">
+                                    <i class="fas fa-phone"></i> Teléfono *
+                                </label>
+                                <input type="tel" id="telefono" name="telefono" required 
+                                       placeholder="(XXX) XXX-XXXX">
+                            </div>
+                        </div>
+                        
+                        <div class="divider">
+                            <span><i class="fas fa-futbol"></i> Detalles de la Reserva</span>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cancha">
+                                    <i class="fas fa-map-marker-alt"></i> Cancha *
+                                </label>
+                                <select id="cancha" name="cancha" required>
+                                    <option value="">Seleccionar cancha</option>
+                                    <option value="cancha1">Cancha 1 - Césped Sintético</option>
+                                    <option value="cancha2">Cancha 2 - Césped Natural</option>
+                                    <option value="cancha3">Cancha 3 - Techada</option>
+                                    <option value="cancha4">Cancha 4 - Iluminación LED</option>
+                                    <option value="cancha5">Cancha 5 - Premium</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fecha">
+                                    <i class="fas fa-calendar-alt"></i> Fecha *
+                                </label>
+                                <input type="date" id="fecha" name="fecha" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hora">
+                                    <i class="fas fa-clock"></i> Hora *
+                                </label>
+                                <select id="hora" name="hora" required>
+                                    <option value="">Seleccionar hora</option>
+                                    <option value="08:00">08:00 AM</option>
+                                    <option value="09:00">09:00 AM</option>
+                                    <option value="10:00">10:00 AM</option>
+                                    <option value="11:00">11:00 AM</option>
+                                    <option value="12:00">12:00 PM</option>
+                                    <option value="13:00">01:00 PM</option>
+                                    <option value="14:00">02:00 PM</option>
+                                    <option value="15:00">03:00 PM</option>
+                                    <option value="16:00">04:00 PM</option>
+                                    <option value="17:00">05:00 PM</option>
+                                    <option value="18:00">06:00 PM</option>
+                                    <option value="19:00">07:00 PM</option>
+                                    <option value="20:00">08:00 PM</option>
+                                    <option value="21:00">09:00 PM</option>
+                                    <option value="22:00">10:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="duracion">
+                                    <i class="fas fa-hourglass-half"></i> Duración *
+                                </label>
+                                <select id="duracion" name="duracion" required>
+                                    <option value="1">1 hora - $2,500</option>
+                                    <option value="1.5">1.5 horas - $3,750</option>
+                                    <option value="2">2 horas - $5,000</option>
+                                    <option value="2.5">2.5 horas - $6,250</option>
+                                    <option value="3">3 horas - $7,500</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="comentarios">
+                                <i class="fas fa-comment"></i> Comentarios adicionales (opcional)
+                            </label>
+                            <textarea id="comentarios" name="comentarios" rows="3" 
+                                      placeholder="¿Algo especial que debamos saber?"></textarea>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn-reservar-grande">
+                                <i class="fas fa-check-circle"></i>
+                                <span>CONFIRMAR RESERVA</span>
+                            </button>
+                        </div>
+                    </form>
                 </div>
-
-                <div>
-                    <h3 style="color: #2a5298; margin-bottom: 1.5rem;">Detalles de la Reserva</h3>
-
-                    <div class="form-group">
-                        <label for="cancha">Cancha *</label>
-                        <select id="cancha" name="cancha" required>
-                            <option value="">Seleccionar cancha</option>
-                            <option value="1">Cancha 1 - Principal</option>
-                            <option value="2">Cancha 2 - Lateral</option>
-                            <option value="3">Cancha 3 - Profesional</option>
-                        </select>
+            </div>
+            
+            <!-- Summary Column -->
+            <div class="summary-column">
+                <div class="reservation-summary">
+                    <h3><i class="fas fa-receipt"></i> Resumen de la Reserva</h3>
+                    
+                    <div class="summary-details">
+                        <div class="summary-item">
+                            <span>Cancha:</span>
+                            <span id="summary-cancha">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Fecha:</span>
+                            <span id="summary-fecha">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Hora:</span>
+                            <span id="summary-hora">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Duración:</span>
+                            <span id="summary-duracion">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Costo por hora:</span>
+                            <span>$2,500</span>
+                        </div>
+                        
+                        <div class="summary-divider"></div>
+                        
+                        <div class="summary-total">
+                            <span>Total a pagar:</span>
+                            <span id="summary-total">$0</span>
+                        </div>
                     </div>
-
-                    <div class="form-group">
-                        <label for="fecha">Fecha *</label>
-                        <input type="date" id="fecha" name="fecha" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="hora">Hora *</label>
-                        <select id="hora" name="hora" required>
-                            <option value="">Seleccionar hora</option>
-                            <option value="18:00">14:00 - 15:00</option>
-                            <option value="18:00">15:00 - 16:00</option>
-                            <option value="18:00">16:00 - 17:00</option>
-                            <option value="18:00">17:00 - 18:00</option>
-                            <option value="18:00">18:00 - 19:00</option>
-                            <option value="19:00">19:00 - 20:00</option>
-                            <option value="20:00">20:00 - 21:00</option>
-                            <option value="21:00">21:00 - 22:00</option>
-                            <option value="22:00">22:00 - 23:00</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="duracion">Duración</label>
-                        <select id="duracion" name="duracion">
-                            <option value="1">1 hora - $2500</option>
-                            <option value="2">2 horas - $4500</option>
-                        </select>
+                    
+                    <div class="summary-info">
+                        <h4><i class="fas fa-info-circle"></i> Información Importante</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> La reserva se confirma con el pago</li>
+                            <li><i class="fas fa-check-circle"></i> Cancelación gratuita hasta 24h antes</li>
+                            <li><i class="fas fa-check-circle"></i> Presentarse 15 minutos antes</li>
+                            <li><i class="fas fa-check-circle"></i> Zapatos de fútbol 5 recomendados</li>
+                        </ul>
                     </div>
                 </div>
             </div>
-
-            <div style="text-align: center; margin-top: 2rem;">
-                <button type="submit" class="btn">Confirmar Reserva</button>
-            </div>
-        </form>
+        </div>
     </div>
-</div>
-{% endblock %}
+</section>
 
-{% block scripts %}
+<style>
+    /* ====== RESERVATION PAGE STYLES ====== */
+    .reservation-section {
+        padding: 60px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 400px);
+    }
+    
+    .reservation-container {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+    
+    /* Form Column */
+    .form-column {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+    
+    .form-section {
+        padding: 40px;
+    }
+    
+    .form-section h2 {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid var(--secondary-color);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .form-section h2 i {
+        color: var(--secondary-color);
+        font-size: 1.5rem;
+    }
+    
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+    
+    .form-row .full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+    }
+    
+    .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+    }
+    
+    .form-group label i {
+        color: var(--secondary-color);
+        width: 20px;
+        text-align: center;
+    }
+    
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--secondary-color);
+        background: white;
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+    }
+    
+    .form-group input::placeholder {
+        color: #999;
+    }
+    
+    /* Divider */
+    .divider {
+        position: relative;
+        text-align: center;
+        margin: 40px 0;
+        padding: 20px 0;
+    }
+    
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            var(--secondary-color) 50%, 
+            transparent 100%);
+        z-index: 1;
+    }
+    
+    .divider span {
+        background: white;
+        padding: 0 20px;
+        position: relative;
+        z-index: 2;
+        color: var(--primary-color);
+        font-weight: 600;
+        font-size: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .divider i {
+        color: var(--secondary-color);
+    }
+    
+    /* Submit Button */
+    .form-actions {
+        margin-top: 40px;
+        text-align: center;
+    }
+    
+    .btn-reservar-grande {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        background: linear-gradient(135deg, #ff6b35, #ff8533);
+        color: white;
+        padding: 20px 50px;
+        border-radius: 60px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.4rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: none;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        min-width: 300px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        animation: pulse 2s infinite;
+    }
+    
+    .btn-reservar-grande::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, 
+            transparent, 
+            rgba(255, 255, 255, 0.3), 
+            rgba(255, 255, 255, 0.6), 
+            rgba(255, 255, 255, 0.3), 
+            transparent);
+        transition: left 0.8s ease;
+    }
+    
+    .btn-reservar-grande:hover {
+        background: linear-gradient(135deg, #ff8533, #ff6b35);
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(255, 107, 53, 0.6);
+        border-color: rgba(255, 255, 255, 0.5);
+    }
+    
+    .btn-reservar-grande:hover::before {
+        left: 100%;
+    }
+    
+    .btn-reservar-grande i {
+        font-size: 1.6rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .btn-reservar-grande:hover i {
+        transform: rotate(360deg);
+    }
+    
+    /* Summary Column */
+    .summary-column {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+    
+    .reservation-summary {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 2px solid var(--secondary-color);
+    }
+    
+    .reservation-summary h3 {
+        background: linear-gradient(135deg, var(--primary-color), var(--dark-color));
+        color: white;
+        padding: 25px;
+        margin: 0;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .reservation-summary h3 i {
+        font-size: 1.3rem;
+    }
+    
+    .summary-details {
+        padding: 25px;
+    }
+    
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .summary-item span:first-child {
+        color: var(--primary-color);
+        font-weight: 600;
+    }
+    
+    .summary-item span:last-child {
+        color: var(--dark-color);
+        font-weight: 500;
+    }
+    
+    .summary-divider {
+        height: 2px;
+        background: linear-gradient(90deg, 
+            transparent 0%, 
+            var(--secondary-color) 50%, 
+            transparent 100%);
+        margin: 20px 0;
+    }
+    
+    .summary-total {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px 0;
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: var(--secondary-color);
+    }
+    
+    .summary-total span:last-child {
+        font-size: 1.8rem;
+    }
+    
+    .summary-info {
+        padding: 25px;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+    }
+    
+    .summary-info h4 {
+        color: var(--primary-color);
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .summary-info h4 i {
+        color: var(--secondary-color);
+    }
+    
+    .summary-info ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .summary-info li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        color: var(--dark-color);
+        font-size: 0.95rem;
+    }
+    
+    .summary-info li i {
+        color: var(--success-color);
+        font-size: 0.9rem;
+    }
+    
+    /* Animation */
+    @keyframes pulse {
+        0% {
+            box-shadow: 0 0 0 0 rgba(255, 107, 53, 0.7);
+        }
+        70% {
+            box-shadow: 0 0 0 15px rgba(255, 107, 53, 0);
+        }
+        100% {
+            box-shadow: 0 0 0 0 rgba(255, 107, 53, 0);
+        }
+    }
+    
+    /* Responsive */
+    @media (max-width: 992px) {
+        .reservation-container {
+            grid-template-columns: 1fr;
+            gap: 30px;
+        }
+        
+        .summary-column {
+            position: static;
+        }
+        
+        .btn-reservar-grande {
+            min-width: 250px;
+            padding: 18px 40px;
+            font-size: 1.2rem;
+        }
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .form-section {
+            padding: 30px;
+        }
+        
+        .reservation-summary h3 {
+            padding: 20px;
+            font-size: 1.3rem;
+        }
+        
+        .summary-details,
+        .summary-info {
+            padding: 20px;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .form-section {
+            padding: 20px;
+        }
+        
+        .btn-reservar-grande {
+            width: 100%;
+            min-width: auto;
+            padding: 16px 30px;
+            font-size: 1.1rem;
+        }
+        
+        .reservation-section {
+            padding: 40px 0;
+        }
+    }
+</style>
+
 <script>
-    document.getElementById('reservaForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('¡Reserva realizada con éxito! Te contactaremos para confirmar.');
-        this.reset();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elements
+        const form = document.getElementById('reservationForm');
+        const canchaSelect = document.getElementById('cancha');
+        const fechaInput = document.getElementById('fecha');
+        const horaSelect = document.getElementById('hora');
+        const duracionSelect = document.getElementById('duracion');
+        
+        // Summary elements
+        const summaryCancha = document.getElementById('summary-cancha');
+        const summaryFecha = document.getElementById('summary-fecha');
+        const summaryHora = document.getElementById('summary-hora');
+        const summaryDuracion = document.getElementById('summary-duracion');
+        const summaryTotal = document.getElementById('summary-total');
+        
+        // Set minimum date to today
+        const today = new Date();
+        const formattedToday = today.toISOString().split('T')[0];
+        fechaInput.min = formattedToday;
+        
+        // Format date
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+        
+        // Format hour
+        function formatHour(hour) {
+            const [hours, minutes] = hour.split(':');
+            const hourNum = parseInt(hours);
+            const ampm = hourNum >= 12 ? 'PM' : 'AM';
+            const formattedHour = hourNum % 12 || 12;
+            return `${formattedHour}:${minutes} ${ampm}`;
+        }
+        
+        // Calculate total
+        function calculateTotal() {
+            const duracion = parseFloat(duracionSelect.value) || 0;
+            const precioPorHora = 2500;
+            const total = duracion * precioPorHora;
+            return total.toLocaleString('es-AR', {
+                style: 'currency',
+                currency: 'ARS',
+                minimumFractionDigits: 0
+            });
+        }
+        
+        // Update summary
+        function updateSummary() {
+            // Cancha
+            const canchaText = canchaSelect.options[canchaSelect.selectedIndex].text;
+            summaryCancha.textContent = canchaSelect.value ? canchaText : '-';
+            
+            // Fecha
+            summaryFecha.textContent = fechaInput.value ? formatDate(fechaInput.value) : '-';
+            
+            // Hora
+            summaryHora.textContent = horaSelect.value ? formatHour(horaSelect.value) : '-';
+            
+            // Duración
+            const duracionText = duracionSelect.options[duracionSelect.selectedIndex].text;
+            summaryDuracion.textContent = duracionSelect.value ? duracionText : '-';
+            
+            // Total
+            summaryTotal.textContent = duracionSelect.value ? calculateTotal() : '$0';
+        }
+        
+        // Event listeners for live updates
+        canchaSelect.addEventListener('change', updateSummary);
+        fechaInput.addEventListener('change', updateSummary);
+        horaSelect.addEventListener('change', updateSummary);
+        duracionSelect.addEventListener('change', updateSummary);
+        
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Validate form
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = 'var(--error-color)';
+                } else {
+                    field.style.borderColor = '';
+                }
+            });
+            
+            if (!isValid) {
+                alert('Por favor completa todos los campos requeridos (*)');
+                return;
+            }
+            
+            // Show success message
+            const submitBtn = form.querySelector('.btn-reservar-grande');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>PROCESANDO...</span>';
+            submitBtn.disabled = true;
+            
+            setTimeout(() => {
+                alert('¡Reserva confirmada con éxito! Te hemos enviado un email de confirmación.');
+                form.reset();
+                updateSummary();
+                
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                // Redirect to home after 2 seconds
+                setTimeout(() => {
+                    window.location.href = "{% url 'index' %}";
+                }, 2000);
+            }, 1500);
+        });
+        
+        // Initialize summary
+        updateSummary();
     });
-
-    // Set minimum date to today
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('fecha').min = today;
 </script>
 {% endblock %}

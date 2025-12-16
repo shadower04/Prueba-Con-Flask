@@ -36,21 +36,38 @@
                 </tbody>
             </table>
         </div>
-
-        <div style="margin-top: 2rem; text-align: center;">
-            <a href="{{ url_for('reservas') }}" class="btn">Reservar Ahora</a>
-        </div>
     </div>
 </div>
 
 <!-- Modal para confirmar reserva -->
 <div id="modalReserva" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; width: 400px; max-width: 90%;">
-        <h3 style="margin-bottom: 1rem;">Confirmar Reserva</h3>
-        <p id="detalleReserva" style="margin-bottom: 1.5rem;"></p>
-        <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; width: 500px; max-width: 90%;">
+        <h3 style="margin-bottom: 1rem; color: #2a5298;">Datos de Reserva</h3>
+        <p id="detalleReserva" style="margin-bottom: 1.5rem; font-weight: bold; color: #333;"></p>
+        
+        <div style="background: #e8f4f8; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem;">
+            <p style="margin: 0.5rem 0;"><strong>Precio total:</strong> $20.000</p>
+            <p style="margin: 0.5rem 0; color: #2a5298;"><strong>Seña a pagar (15%):</strong> $3.000</p>
+        </div>
+
+        <form id="formDatosCliente">
+            <div class="form-group">
+                <label for="nombre">Nombre completo *</label>
+                <input type="text" id="nombre" required style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
+            </div>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" required style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
+            </div>
+            <div class="form-group">
+                <label for="telefono">Teléfono *</label>
+                <input type="tel" id="telefono" required placeholder="Ej: 1123456789" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
+            </div>
+        </form>
+
+        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
             <button id="cancelarReserva" class="btn" style="background: #6c757d;">Cancelar</button>
-            <button id="confirmarReserva" class="btn">Confirmar Reserva</button>
+            <button id="confirmarReserva" class="btn">Ir a Pagar</button>
         </div>
     </div>
 </div>
@@ -59,6 +76,22 @@
 // Variables globales
 let reservaActual = { hora: null, cancha: null, celdaId: null };
 const horarios = ['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00', '18:00-19:00'];
+
+// Función para obtener el CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
 
 // Cuando la página carga
 document.addEventListener('DOMContentLoaded', function() {
@@ -85,7 +118,7 @@ function cargarDisponibilidad() {
     loading.style.display = 'block';
     tabla.innerHTML = '';
     
-    fetch(`/api/disponibilidad?fecha=${fecha}`)
+    fetch(`/api/disponibilidad/?fecha=${fecha}`)
         .then(response => {
             if (!response.ok) throw new Error('Error en la respuesta del servidor');
             return response.json();
@@ -159,8 +192,11 @@ function reservarCancha(hora, cancha, celdaId) {
     const modal = document.getElementById('modalReserva');
     const detalle = document.getElementById('detalleReserva');
     
-    detalle.textContent = `¿Confirmar reserva para Cancha ${cancha} en el horario ${hora.replace('-', ' - ')}?`;
+    detalle.textContent = `Cancha ${cancha} - ${hora.replace('-', ' - ')}`;
     modal.style.display = 'block';
+    
+    // Limpiar formulario
+    document.getElementById('formDatosCliente').reset();
 }
 
 function cerrarModal() {
@@ -171,36 +207,60 @@ function cerrarModal() {
 function confirmarReserva() {
     if (!reservaActual.celdaId) return;
     
-    const fecha = document.getElementById('fechaConsulta').value;
-    console.log("✅ Confirmando reserva:", {...reservaActual, fecha});
+    // Validar formulario
+    const nombre = document.getElementById('nombre').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const telefono = document.getElementById('telefono').value.trim();
     
-    fetch('/reservar', {
+    if (!nombre || !email || !telefono) {
+        alert('❌ Por favor completá todos los campos');
+        return;
+    }
+    
+    const fecha = document.getElementById('fechaConsulta').value;
+    console.log("✅ Confirmando reserva:", {...reservaActual, fecha, nombre, email, telefono});
+    
+    // Obtener el token CSRF
+    const csrftoken = getCookie('csrftoken');
+    
+    // Deshabilitar botón
+    const btnConfirmar = document.getElementById('confirmarReserva');
+    btnConfirmar.disabled = true;
+    btnConfirmar.textContent = 'Procesando...';
+    
+    fetch('/reservar/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'X-CSRFToken': csrftoken,
         },
         body: JSON.stringify({
             hora: reservaActual.hora,
             cancha: reservaActual.cancha,
-            fecha: fecha
+            fecha: fecha,
+            nombre: nombre,
+            email: email,
+            telefono: telefono
         })
     })
     .then(response => response.json())
     .then(data => {
         console.log("📨 Respuesta del servidor:", data);
-        if (data.success) {
-            alert('✅ ' + data.message);
-            // Recargar la disponibilidad para ver los cambios
-            cargarDisponibilidad();
+        if (data.success && data.init_point) {
+            alert('✅ Redirigiendo a MercadoPago...');
+            // Redirigir a MercadoPago
+            window.location.href = data.init_point;
         } else {
             alert('❌ ' + data.message);
+            btnConfirmar.disabled = false;
+            btnConfirmar.textContent = 'Ir a Pagar';
         }
-        cerrarModal();
     })
     .catch(error => {
         console.error('❌ Error:', error);
         alert('❌ Error al realizar la reserva');
-        cerrarModal();
+        btnConfirmar.disabled = false;
+        btnConfirmar.textContent = 'Ir a Pagar';
     });
 }
 

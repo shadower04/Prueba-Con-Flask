@@ -1,0 +1,36 @@
+
+{% extends "base.html" %}
+
+{% block title %}Pago Exitoso{% endblock %}
+
+{% block content %}
+<div class="container" style="margin-top: 120px; text-align: center;">
+    <div style="background: white; padding: 3rem; border-radius: 10px; max-width: 600px; margin: 0 auto;">
+        <div style="font-size: 5rem; color: #28a745;">✅</div>
+        <h1 style="color: #28a745; margin: 1rem 0;">¡Pago Exitoso!</h1>
+        <p style="font-size: 1.2rem; margin: 1rem 0;">Tu reserva ha sido confirmada</p>
+        
+        {% if reserva %}
+        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; text-align: left;">
+            <h3 style="color: #2a5298; margin-bottom: 1rem;">Detalles de la Reserva:</h3>
+            <p><strong>Cancha:</strong> {{ reserva.cancha }}</p>
+            <p><strong>Fecha:</strong> {{ reserva.fecha }}</p>
+            <p><strong>Horario:</strong> {{ reserva.hora }}</p>
+            <p><strong>Nombre:</strong> {{ reserva.nombre }}</p>
+            <p><strong>Email:</strong> {{ reserva.email }}</p>
+            <p><strong>Teléfono:</strong> {{ reserva.telefono }}</p>
+            <hr style="margin: 1rem 0;">
+            <p><strong>Precio total:</strong> ${{ reserva.precio_total }}</p>
+            <p><strong>Seña pagada:</strong> ${{ reserva.seña }}</p>
+            <p style="color: #ff6b35;"><strong>Pendiente de pago:</strong> ${% widthratio reserva.precio_total 1 1|add:"-"|add:reserva.seña|floatformat:0 %}17000</strong></p>
+        </div>
+        {% endif %}
+        
+        <div style="background: #fff3cd; padding: 1rem; border-radius: 5px; margin: 1.5rem 0;">
+            <p style="margin: 0; color: #856404;">📧 Te enviamos un comprobante en PDF a tu email</p>
+        </div>
+        
+        <a href="{% url 'disponibilidad' %}" class="btn" style="margin-top: 1rem;">Volver a Disponibilidad</a>
+    </div>
+</div>
+{% endblock %}

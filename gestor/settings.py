@@ -121,3 +121,17 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# MercadoPago Configuration
+MERCADOPAGO_ACCESS_TOKEN = 'APP_USR-5841245844373772-121617-855bd24cb249e2cdcbd48688a448049f-2974538585'  # Lo vas a reemplazar cuando lo consigas
+
+# URLs de retorno
+SITE_URL = 'http://127.0.0.1:8000'  # Cambiar en producción
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'maxialzogaray700@gmail.com'  # Tu email
+EMAIL_HOST_PASSWORD = 'lbzvw lirn nojk gksg'  # La contraseña de app
+DEFAULT_FROM_EMAIL = 'tu_email@gmail.com'
