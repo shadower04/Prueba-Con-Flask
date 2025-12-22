@@ -55,26 +55,56 @@
 </section>
 
 <!-- Quick Reservation -->
+<!-- Quick Reservation -->
 <section class="quick-reservation">
     <div class="container">
-        <h2 class="section-title" style="color: white;">Reserva Rápida</h2>
+        <h2 class="section-title" style="color: white; text-align: center; margin-bottom: 30px;">
+            Reserva Rápida
+        </h2>
         <div class="reservation-form">
             <form id="quickReserveForm">
+                <!-- Campo CANCHA -->
+                <div class="form-group">
+                    <label for="cancha">Cancha</label>
+                    <select id="cancha" name="cancha" class="form-control" required>
+                        <option value="">Seleccionar cancha...</option>
+                        {% for cancha in canchas %}
+                            <option value="{{ cancha.id }}">{{ cancha.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                
+                <!-- Campo NOMBRE -->
                 <div class="form-group">
                     <label for="nombre">Nombre Completo</label>
-                    <input type="text" id="nombre" name="nombre" required>
+                    <input type="text" id="nombre" name="nombre" class="form-control" 
+                           placeholder="Ingresa tu nombre completo" required>
                 </div>
+                
+                <!-- Campo EMAIL -->
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" name="email" class="form-control" 
+                           placeholder="ejemplo@correo.com" required>
+                </div>
+                
+                <!-- Campo TELÉFONO -->
                 <div class="form-group">
                     <label for="telefono">Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono" required>
+                    <input type="tel" id="telefono" name="telefono" class="form-control" 
+                           placeholder="11 1234-5678" required>
                 </div>
+                
+                <!-- Campo FECHA -->
                 <div class="form-group">
                     <label for="fecha">Fecha</label>
-                    <input type="date" id="fecha" name="fecha" required>
+                    <input type="date" id="fecha" name="fecha" class="form-control" required>
                 </div>
+                
+                <!-- Campo HORA -->
                 <div class="form-group">
                     <label for="hora">Hora</label>
-                    <select id="hora" name="hora" required>
+                    <select id="hora" name="hora" class="form-control" required>
                         <option value="">Seleccionar hora</option>
                         <option value="14:00">14:00</option>
                         <option value="15:00">15:00</option>
@@ -87,7 +117,16 @@
                         <option value="22:00">22:00</option>
                     </select>
                 </div>
-                <button type="submit" class="btn">Reservar Cancha</button>
+                
+                <button type="submit" class="btn">
+                    <i class="fas fa-credit-card"></i> Reservar y Pagar Ahora
+                </button>
+                
+                <div style="text-align: center; margin-top: 15px;">
+                    <small style="color: rgba(255,255,255,0.8);">
+                        <i class="fas fa-lock"></i> Pago seguro con Mercado Pago
+                    </small>
+                </div>
             </form>
         </div>
     </div>
@@ -96,15 +135,70 @@
 
 {% block scripts %}
 <script>
-    // Form submission
-    document.getElementById('quickReserveForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-        alert('¡Reserva realizada con éxito! Te contactaremos para confirmar.');
-        this.reset();
-    });
-
-    // Set minimum date to today
+// Form submission para reserva con Mercado Pago
+document.getElementById('quickReserveForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Obtener botón de submit
+    const submitBtn = this.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    
+    // Cambiar texto del botón
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando...';
+    submitBtn.disabled = true;
+    
+    // Obtener datos del formulario
+    const formData = {
+        cancha: document.getElementById('cancha').value,
+        nombre: document.getElementById('nombre').value,
+        email: document.getElementById('email').value,
+        telefono: document.getElementById('telefono').value,
+        fecha: document.getElementById('fecha').value,
+        hora: document.getElementById('hora').value
+    };
+    
+    // Validar fecha (no puede ser anterior a hoy)
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('fecha').min = today;
+    if (formData.fecha < today) {
+        alert('❌ La fecha no puede ser anterior a hoy');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+        return;
+    }
+    
+    // Enviar a la vista 'reservar'
+    fetch("{% url 'reservar' %}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Respuesta:', data);
+        
+        if (data.success) {
+            // Redirigir a Mercado Pago
+            alert('✅ Redirigiendo a Mercado Pago para completar el pago...');
+            window.location.href = data.init_point;
+        } else {
+            alert('❌ Error: ' + (data.message || 'No se pudo crear la reserva'));
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('❌ Error de conexión. Por favor, intenta nuevamente.');
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+
+// Set minimum date to today
+const today = new Date().toISOString().split('T')[0];
+document.getElementById('fecha').min = today;
 </script>
 {% endblock %}

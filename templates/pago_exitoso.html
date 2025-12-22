@@ -1,36 +1,165 @@
-
-{% extends "base.html" %}
-
-{% block title %}Pago Exitoso{% endblock %}
-
-{% block content %}
-<div class="container" style="margin-top: 120px; text-align: center;">
-    <div style="background: white; padding: 3rem; border-radius: 10px; max-width: 600px; margin: 0 auto;">
-        <div style="font-size: 5rem; color: #28a745;">✅</div>
-        <h1 style="color: #28a745; margin: 1rem 0;">¡Pago Exitoso!</h1>
-        <p style="font-size: 1.2rem; margin: 1rem 0;">Tu reserva ha sido confirmada</p>
-        
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago Exitoso - Cancha 5 "El Golazo"</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .success-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        .success-icon {
+            font-size: 80px;
+            color: #4CAF50;
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .reserva-info {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .info-item {
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .info-label {
+            font-weight: bold;
+            color: #555;
+        }
+        .info-value {
+            color: #333;
+        }
+        .btn-group {
+            margin-top: 30px;
+        }
+        .btn-home {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .btn-home:hover {
+            background: #388E3C;
+            color: white;
+            transform: translateY(-3px);
+        }
+        .btn-pdf {
+            background: #2196F3;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s;
+        }
+        .btn-pdf:hover {
+            background: #1976D2;
+            color: white;
+            transform: translateY(-3px);
+        }
+        .alert {
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="success-card">
         {% if reserva %}
-        <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; text-align: left;">
-            <h3 style="color: #2a5298; margin-bottom: 1rem;">Detalles de la Reserva:</h3>
-            <p><strong>Cancha:</strong> {{ reserva.cancha }}</p>
-            <p><strong>Fecha:</strong> {{ reserva.fecha }}</p>
-            <p><strong>Horario:</strong> {{ reserva.hora }}</p>
-            <p><strong>Nombre:</strong> {{ reserva.nombre }}</p>
-            <p><strong>Email:</strong> {{ reserva.email }}</p>
-            <p><strong>Teléfono:</strong> {{ reserva.telefono }}</p>
-            <hr style="margin: 1rem 0;">
-            <p><strong>Precio total:</strong> ${{ reserva.precio_total }}</p>
-            <p><strong>Seña pagada:</strong> ${{ reserva.seña }}</p>
-            <p style="color: #ff6b35;"><strong>Pendiente de pago:</strong> ${% widthratio reserva.precio_total 1 1|add:"-"|add:reserva.seña|floatformat:0 %}17000</strong></p>
-        </div>
+            <div class="success-icon">✅</div>
+            <h1>¡Pago Exitoso!</h1>
+            <p class="lead">Tu reserva ha sido confirmada exitosamente.</p>
+            
+            <div class="reserva-info">
+                <div class="info-item">
+                    <span class="info-label">ID de Reserva:</span>
+                    <span class="info-value">#{{ reserva.id }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Cancha:</span>
+                    <span class="info-value">Cancha {{ reserva.cancha }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Fecha:</span>
+                    <span class="info-value">{{ reserva.fecha }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Horario:</span>
+                    <span class="info-value">{{ reserva.hora }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Nombre:</span>
+                    <span class="info-value">{{ reserva.nombre }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value">{{ reserva.email }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Precio Total:</span>
+                    <span class="info-value">${{ reserva.precio_total|floatformat:0 }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Seña Pagada:</span>
+                    <span class="info-value">${{ reserva.seña|floatformat:0 }}</span>
+                </div>
+                {% if payment_id %}
+                <div class="info-item">
+                    <span class="info-label">ID de Pago:</span>
+                    <span class="info-value">{{ payment_id }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <div class="alert alert-success">
+                <strong>¡Revisá tu email!</strong> Te enviamos el comprobante en PDF.
+            </div>
+            
+            <div class="btn-group">
+                <a href="/" class="btn-home">🏠 Volver al Inicio</a>
+                {% if reserva.id %}
+                <a href="{% url 'test_pdf' reserva.id %}" class="btn-pdf" target="_blank">📄 Descargar PDF</a>
+                {% endif %}
+            </div>
+            
+        {% else %}
+            <div class="success-icon">⚠️</div>
+            <h1>Reserva No Encontrada</h1>
+            <p class="lead">No se pudo encontrar la información de tu reserva.</p>
+            <div class="alert alert-warning">
+                Por favor, contacta con soporte o verifica que hayas completado el pago.
+            </div>
+            <a href="/" class="btn-home">🏠 Volver al Inicio</a>
         {% endif %}
-        
-        <div style="background: #fff3cd; padding: 1rem; border-radius: 5px; margin: 1.5rem 0;">
-            <p style="margin: 0; color: #856404;">📧 Te enviamos un comprobante en PDF a tu email</p>
-        </div>
-        
-        <a href="{% url 'disponibilidad' %}" class="btn" style="margin-top: 1rem;">Volver a Disponibilidad</a>
     </div>
-</div>
-{% endblock %}
+</body>
+</html>

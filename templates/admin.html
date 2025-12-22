@@ -1,95 +1,379 @@
 {% extends "base.html" %}
 
-{% block title %}Panel Administración{% endblock %}
+{% block title %}Panel Admin - El Golazo{% endblock %}
 
 {% block content %}
+<style>
+    .admin-header {
+        background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+    }
+    
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 3rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 15px;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        text-align: center;
+        transition: transform 0.3s;
+        border-left: 5px solid #ff6b35;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: bold;
+        color: #2a5298;
+        margin: 0.5rem 0;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 1rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .reservas-section {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+    }
+    
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 3px solid #ff6b35;
+    }
+    
+    .filters {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1.5rem;
+    }
+    
+    .filter-btn {
+        padding: 0.5rem 1.5rem;
+        border: 2px solid #e0e0e0;
+        background: white;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: all 0.3s;
+        font-weight: 600;
+    }
+    
+    .filter-btn:hover, .filter-btn.active {
+        background: #2a5298;
+        color: white;
+        border-color: #2a5298;
+    }
+    
+    .reservas-table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+    }
+    
+    .reservas-table thead {
+        background: #2a5298;
+        color: white;
+    }
+    
+    .reservas-table th {
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+    
+    .reservas-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
+    }
+    
+    .reservas-table tbody tr {
+        transition: background 0.2s;
+    }
+    
+    .reservas-table tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .badge {
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-block;
+    }
+    
+    .badge-confirmada {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-pendiente {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .badge-cancelada {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+        text-decoration: none;
+        display: inline-block;
+    }
+    
+    .btn-pdf {
+        background: #ff6b35;
+        color: white;
+    }
+    
+    .btn-pdf:hover {
+        background: #e55a2b;
+        transform: scale(1.05);
+    }
+    
+    .btn-cancel {
+        background: #dc3545;
+        color: white;
+    }
+    
+    .btn-cancel:hover {
+        background: #c82333;
+    }
+    
+    .logout-btn {
+        background: #6c757d;
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: all 0.3s;
+        display: inline-block;
+    }
+    
+    .logout-btn:hover {
+        background: #5a6268;
+        transform: translateY(-2px);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #999;
+    }
+    
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .reservas-table {
+            font-size: 0.9rem;
+        }
+        
+        .reservas-table td, .reservas-table th {
+            padding: 0.75rem 0.5rem;
+        }
+    }
+</style>
 
-<div class="page-header">
+<!-- Admin Header -->
+<div class="admin-header">
     <div class="container">
-        <h1>Panel de Administración</h1>
-        <p>Gestión completa del sistema de reservas</p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="margin: 0;">📊 Panel de Administración</h1>
+                <p style="margin: 0.5rem 0 0 0; opacity: 0.9;">Bienvenido, {{ request.user.username }}</p>
+            </div>
+            <a href="{% url 'admin_logout' %}" class="logout-btn">
+                🚪 Cerrar Sesión
+            </a>
+        </div>
     </div>
 </div>
 
 <div class="container">
-
     <!-- Estadísticas -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">📋</div>
+            <div class="stat-number">{{ total_reservas }}</div>
+            <div class="stat-label">Total Reservas</div>
+        </div>
         
-        <div style="background:white; padding:1.5rem; border-radius:10px; text-align:center;">
-            <h3>{{ total_reservas }}</h3>
-            <p>Total Reservas</p>
+        <div class="stat-card">
+            <div class="stat-icon">⚽</div>
+            <div class="stat-number">3</div>
+            <div class="stat-label">Canchas Activas</div>
         </div>
-
-        <div style="background:white; padding:1.5rem; border-radius:10px; text-align:center;">
-            <h3>3</h3>
-            <p>Canchas Activas</p>
+        
+        <div class="stat-card">
+            <div class="stat-icon">💰</div>
+            <div class="stat-number">${{ ingresos }}</div>
+            <div class="stat-label">Ingresos (Señas)</div>
         </div>
-
-        <div style="background:white; padding:1.5rem; border-radius:10px; text-align:center;">
-            <h3>${{ ingresos }}</h3>
-            <p>Ingresos Estimados</p>
-        </div>
-
-        <div style="background:white; padding:1.5rem; border-radius:10px; text-align:center;">
-            <h3>{{ tasa_confirm }}%</h3>
-            <p>Tasa de Confirmación</p>
+        
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-number">{{ tasa_confirm }}%</div>
+            <div class="stat-label">Tasa Confirmación</div>
         </div>
     </div>
 
+    <!-- Sección de Reservas -->
+    <div class="reservas-section">
+        <div class="section-header">
+            <h2 style="margin: 0; color: #2a5298;">📋 Gestión de Reservas</h2>
+        </div>
 
-    <!-- LISTA DE RESERVAS -->
-    <div class="content-section">
-        <h2 style="color:#2a5298; margin-bottom:1.5rem;">📋 Todas las Reservas</h2>
+        <!-- Filtros -->
+        <div class="filters">
+            <button class="filter-btn active" onclick="filtrarReservas('todas')">Todas</button>
+            <button class="filter-btn" onclick="filtrarReservas('confirmada')">✅ Confirmadas</button>
+            <button class="filter-btn" onclick="filtrarReservas('pendiente')">⏳ Pendientes</button>
+            <button class="filter-btn" onclick="filtrarReservas('cancelada')">❌ Canceladas</button>
+        </div>
 
+        <!-- Tabla de Reservas -->
         {% if reservas %}
-        <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-                <tr style="background:#2a5298; color:white;">
-                    <th style="padding:1rem;">Cliente</th>
-                    <th style="padding:1rem;">Cancha</th>
-                    <th style="padding:1rem;">Fecha / Hora</th>
-                    <th style="padding:1rem;">Estado</th>
-                </tr>
-            </thead>
-
-            <tbody>
-                {% for r in reservas %}
-                <tr style="border-bottom:1px solid #ccc;">
-                    <td style="padding:1rem;">
-                        <strong>{{ r.nombre }}</strong><br>
-                        <small>{{ r.email }}</small><br>
-                        <small>{{ r.telefono }}</small>
-                    </td>
-
-                    <td style="padding:1rem; text-align:center;">
-                        Cancha {{ r.cancha }}
-                    </td>
-
-                    <td style="padding:1rem; text-align:center;">
-                        {{ r.fecha }}<br>
-                        <small>{{ r.hora }}</small>
-                    </td>
-
-                    <td style="padding:1rem; text-align:center;">
-                        {% if r.estado == 'confirmada' %}
-                            <span style="background:#d4edda; color:#155724; padding:5px 10px; border-radius:10px;">Confirmada</span>
-                        {% elif r.estado == 'pendiente' %}
-                            <span style="background:#fff3cd; color:#856404; padding:5px 10px; border-radius:10px;">Pendiente</span>
-                        {% else %}
-                            <span style="background:#f8d7da; color:#721c24; padding:5px 10px; border-radius:10px;">Cancelada</span>
-                        {% endif %}
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
+        <div style="overflow-x: auto;">
+            <table class="reservas-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Cliente</th>
+                        <th>Cancha</th>
+                        <th>Fecha</th>
+                        <th>Horario</th>
+                        <th>Estado</th>
+                        <th>Seña</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tabla-reservas">
+                    {% for r in reservas %}
+                    <tr data-estado="{{ r.estado }}">
+                        <td><strong>#{{ r.id }}</strong></td>
+                        <td>
+                            <strong>{{ r.nombre }}</strong><br>
+                            <small style="color: #666;">{{ r.email }}</small><br>
+                            <small style="color: #666;">📞 {{ r.telefono }}</small>
+                        </td>
+                        <td style="text-align: center;">
+                            <strong>Cancha {{ r.cancha }}</strong>
+                        </td>
+                        <td>{{ r.fecha }}</td>
+                        <td>{{ r.hora }}</td>
+                        <td>
+                            {% if r.estado == 'confirmada' %}
+                                <span class="badge badge-confirmada">✅ Confirmada</span>
+                            {% elif r.estado == 'pendiente' %}
+                                <span class="badge badge-pendiente">⏳ Pendiente</span>
+                            {% else %}
+                                <span class="badge badge-cancelada">❌ Cancelada</span>
+                            {% endif %}
+                        </td>
+                        <td><strong>${{ r.seña|floatformat:0 }}</strong></td>
+                        <td>
+                            <div class="actions">
+                                <a href="{% url 'test_pdf' r.id %}" class="btn-action btn-pdf" title="Descargar PDF">
+                                    📄 PDF
+                                </a>
+                                {% if r.estado != 'cancelada' %}
+                                <button class="btn-action btn-cancel" onclick="cancelarReserva({{ r.id }})" title="Cancelar reserva">
+                                    ❌
+                                </button>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {% else %}
-        <p style="text-align:center;">No hay reservas registradas.</p>
+        <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <h3>No hay reservas registradas</h3>
+            <p>Las reservas aparecerán aquí cuando los clientes realicen reservas</p>
+        </div>
         {% endif %}
-
     </div>
 </div>
+
+<script>
+// Filtrar reservas por estado
+function filtrarReservas(estado) {
+    const filas = document.querySelectorAll('#tabla-reservas tr');
+    const botones = document.querySelectorAll('.filter-btn');
+    
+    // Actualizar botones activos
+    botones.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Filtrar filas
+    filas.forEach(fila => {
+        if (estado === 'todas') {
+            fila.style.display = '';
+        } else {
+            const estadoFila = fila.dataset.estado;
+            fila.style.display = estadoFila === estado ? '' : 'none';
+        }
+    });
+}
+
+// Cancelar reserva
+function cancelarReserva(id) {
+    if (confirm('¿Estás seguro de cancelar esta reserva?')) {
+        alert('Funcionalidad de cancelación - Implementar endpoint');
+        // Aquí podrías hacer un fetch a un endpoint de cancelación
+    }
+}
+</script>
 
 {% endblock %}

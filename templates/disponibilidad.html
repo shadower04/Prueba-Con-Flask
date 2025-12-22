@@ -1,177 +1,619 @@
 {% extends "base.html" %}
 
-{% block title %}Disponibilidad - El Golazo{% endblock %}
+{% block title %}Disponibilidad de Canchas - El Golazo{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ===== RESET Y VARIABLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --primary: #2563eb;
+    --primary-dark: #1d4ed8;
+    --primary-light: #3b82f6;
+    --secondary: #10b981;
+    --secondary-dark: #059669;
+    --danger: #ef4444;
+    --danger-dark: #dc2626;
+    --light: #f8fafc;
+    --dark: #1e293b;
+    --gray: #64748b;
+    --gray-light: #e2e8f0;
+    --border-radius: 12px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.12);
+    --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+    --shadow-lg: 0 10px 25px -5px rgba(0,0,0,0.1);
+    --transition: all 0.2s ease;
+}
+
+body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background-color: #f1f5f9;
+    color: var(--dark);
+    line-height: 1.6;
+}
+
+/* ===== HEADER ===== */
+.page-header {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    padding: 2.5rem 1rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--shadow-md);
+}
+
+.page-header .container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.page-header h1 {
+    font-size: 2.25rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+}
+
+.page-header p {
+    font-size: 1.125rem;
+    opacity: 0.9;
+    max-width: 32rem;
+}
+
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.content-section {
+    background: white;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 2rem;
+}
+
+/* ===== FORMULARIO ===== */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    color: var(--dark);
+    font-size: 1rem;
+}
+
+#fechaConsulta {
+    width: 100%;
+    max-width: 16rem;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray-light);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: white;
+    font-family: inherit;
+}
+
+#fechaConsulta:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ===== LOADING ===== */
+#loading {
+    text-align: center;
+    padding: 3rem;
+}
+
+.spinner {
+    width: 3rem;
+    height: 3rem;
+    border: 3px solid var(--gray-light);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* ===== TABLA ===== */
+.table-container {
+    overflow-x: auto;
+    border-radius: var(--border-radius);
+    border: 1px solid var(--gray-light);
+    margin-top: 2rem;
+}
+
+#tablaDisponibilidad {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+#tablaDisponibilidad thead {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+}
+
+#tablaDisponibilidad th {
+    padding: 1rem 1.5rem;
+    text-align: left;
+    font-weight: 600;
+    color: white;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+#tablaDisponibilidad th:first-child {
+    border-top-left-radius: var(--border-radius);
+}
+
+#tablaDisponibilidad th:last-child {
+    border-top-right-radius: var(--border-radius);
+}
+
+#tablaDisponibilidad th:not(:first-child) {
+    text-align: center;
+}
+
+#tablaDisponibilidad tbody tr {
+    transition: var(--transition);
+}
+
+#tablaDisponibilidad tbody tr:nth-child(even) {
+    background-color: #f8fafc;
+}
+
+#tablaDisponibilidad tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+#tablaDisponibilidad td {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--gray-light);
+    vertical-align: middle;
+}
+
+#tablaDisponibilidad td:first-child {
+    font-weight: 600;
+    color: var(--dark);
+}
+
+#tablaDisponibilidad td:not(:first-child) {
+    text-align: center;
+}
+
+/* ===== BADGES ===== */
+.badge {
+    padding: 0.5rem 1.25rem;
+    border-radius: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.875rem;
+    min-width: 7.5rem;
+    transition: var(--transition);
+    gap: 0.5rem;
+}
+
+.badge-disponible {
+    background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
+    color: white;
+    cursor: pointer;
+}
+
+.badge-disponible:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.badge-ocupada {
+    background: linear-gradient(135deg, var(--danger) 0%, var(--danger-dark) 100%);
+    color: white;
+}
+
+/* ===== MODAL ===== */
+#modalReserva {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease;
+}
+
+.modal-content {
+    background: white;
+    border-radius: var(--border-radius);
+    width: 100%;
+    max-width: 32rem;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+    animation: slideIn 0.3s ease;
+}
+
+.modal-header {
+    padding: 1.5rem 1.5rem 1rem;
+    border-bottom: 1px solid var(--gray-light);
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--dark);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+#detalleReserva {
+    background: #f0f9ff;
+    border-left: 4px solid var(--primary);
+    padding: 0.75rem 1rem;
+    border-radius: 0.375rem;
+    margin-top: 1rem;
+    font-weight: 600;
+    color: var(--primary-dark);
+}
+
+/* ===== PRECIOS ===== */
+.info-precios {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    padding: 1.5rem;
+    margin: 1.5rem;
+    border-radius: var(--border-radius);
+    border: 1px solid #bae6fd;
+}
+
+.info-precios p {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.info-precios p:last-child {
+    margin-bottom: 0;
+}
+
+.precio-total {
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.sena-pagar {
+    color: var(--primary-dark);
+    font-weight: 700;
+}
+
+/* ===== FORMULARIO MODAL ===== */
+#formDatosCliente {
+    padding: 0 1.5rem;
+}
+
+#formDatosCliente .form-group {
+    margin-bottom: 1.25rem;
+}
+
+#formDatosCliente label {
+    display: block;
+    margin-bottom: 0.375rem;
+    font-weight: 600;
+    color: var(--dark);
+    font-size: 0.875rem;
+}
+
+#formDatosCliente input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--gray-light);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    transition: var(--transition);
+    background: white;
+    font-family: inherit;
+}
+
+#formDatosCliente input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+/* ===== BOTONES ===== */
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray-light);
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    flex: 1;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.btn-secondary {
+    background: var(--gray);
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #475569;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    background: linear-gradient(135deg, var(--primary-dark) 0%, #1e40af 100%);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== ANIMACIONES ===== */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-1rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .page-header {
+        padding: 2rem 1rem;
+    }
+    
+    .page-header h1 {
+        font-size: 1.75rem;
+    }
+    
+    .content-section {
+        padding: 1.5rem;
+    }
+    
+    .modal-actions {
+        flex-direction: column;
+    }
+    
+    .btn {
+        width: 100%;
+    }
+    
+    #tablaDisponibilidad {
+        min-width: 100%;
+    }
+    
+    #tablaDisponibilidad th,
+    #tablaDisponibilidad td {
+        padding: 1rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .content-section {
+        padding: 1rem;
+    }
+    
+    .modal-content {
+        padding: 0;
+    }
+    
+    .badge {
+        min-width: 6rem;
+        padding: 0.5rem 1rem;
+    }
+}
+</style>
+{% endblock %}
 
 {% block content %}
 <div class="page-header">
     <div class="container">
-        <h1>Disponibilidad de Canchas</h1>
-        <p>Consulta los horarios disponibles para reservar</p>
+        <h1>🏟️ Disponibilidad de Canchas</h1>
+        <p>Selecciona una fecha para ver los horarios disponibles</p>
     </div>
 </div>
 
 <div class="container">
     <div class="content-section">
         <div class="form-group">
-            <label for="fechaConsulta">Seleccionar Fecha:</label>
-            <input type="date" id="fechaConsulta" name="fechaConsulta" value="{{ fecha_hoy }}">
+            <label for="fechaConsulta">📅 Fecha de reserva</label>
+            <input type="date" id="fechaConsulta" name="fechaConsulta" value="{{ fecha_hoy }}" required>
         </div>
 
-        <div id="loading" style="display: none; text-align: center; padding: 2rem;">
+        <div id="loading" style="display: none;">
+            <div class="spinner"></div>
             <p>Cargando disponibilidad...</p>
         </div>
 
-        <div style="overflow-x: auto;">
-            <table id="tablaDisponibilidad" style="width: 100%; border-collapse: collapse; margin-top: 2rem;">
+        <div class="table-container">
+            <table id="tablaDisponibilidad">
                 <thead>
-                    <tr style="background: #2a5298; color: white;">
-                        <th style="padding: 1rem; text-align: left;">Hora</th>
-                        <th style="padding: 1rem; text-align: center;">Cancha 1</th>
-                        <th style="padding: 1rem; text-align: center;">Cancha 2</th>
-                        <th style="padding: 1rem; text-align: center;">Cancha 3</th>
+                    <tr>
+                        <th>Horario</th>
+                        <th>Cancha 1</th>
+                        <th>Cancha 2</th>
+                        <th>Cancha 3</th>
                     </tr>
                 </thead>
                 <tbody id="cuerpoTabla">
-                    <!-- La tabla se cargará con JavaScript -->
+                    <!-- JS cargará aquí -->
                 </tbody>
             </table>
         </div>
     </div>
 </div>
 
-<!-- Modal para confirmar reserva -->
-<div id="modalReserva" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; width: 500px; max-width: 90%;">
-        <h3 style="margin-bottom: 1rem; color: #2a5298;">Datos de Reserva</h3>
-        <p id="detalleReserva" style="margin-bottom: 1.5rem; font-weight: bold; color: #333;"></p>
+<!-- Modal -->
+<div id="modalReserva">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>📋 Confirmar Reserva</h3>
+            <div id="detalleReserva"></div>
+        </div>
         
-        <div style="background: #e8f4f8; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem;">
-            <p style="margin: 0.5rem 0;"><strong>Precio total:</strong> $20.000</p>
-            <p style="margin: 0.5rem 0; color: #2a5298;"><strong>Seña a pagar (15%):</strong> $3.000</p>
+        <div class="info-precios">
+            <p class="precio-total">
+                <span>Precio total:</span>
+                <span>$20.000</span>
+            </p>
+            <p class="sena-pagar">
+                <span>Seña a pagar (15%):</span>
+                <span>$3.000</span>
+            </p>
         </div>
 
         <form id="formDatosCliente">
             <div class="form-group">
                 <label for="nombre">Nombre completo *</label>
-                <input type="text" id="nombre" required style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
+                <input type="text" id="nombre" required placeholder="Ej: Juan Pérez">
             </div>
             <div class="form-group">
-                <label for="email">Email *</label>
-                <input type="email" id="email" required style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
+                <label for="email">Correo electrónico *</label>
+                <input type="email" id="email" required placeholder="ejemplo@email.com">
             </div>
             <div class="form-group">
                 <label for="telefono">Teléfono *</label>
-                <input type="tel" id="telefono" required placeholder="Ej: 1123456789" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
+                <input type="tel" id="telefono" required placeholder="11 2345-6789">
             </div>
         </form>
 
-        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-            <button id="cancelarReserva" class="btn" style="background: #6c757d;">Cancelar</button>
-            <button id="confirmarReserva" class="btn">Ir a Pagar</button>
+        <div class="modal-actions">
+            <button id="cancelarReserva" class="btn btn-secondary">Cancelar</button>
+            <button id="confirmarReserva" class="btn btn-primary">
+                <span>💳 Ir a pagar</span>
+            </button>
         </div>
     </div>
 </div>
 
 <script>
-// Variables globales
+// Variables
 let reservaActual = { hora: null, cancha: null, celdaId: null };
 const horarios = ['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00', '18:00-19:00'];
 
-// Función para obtener el CSRF token
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
+// Obtener token CSRF
+function getCSRFToken() {
+    return document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+           document.cookie.match(/csrftoken=([^;]+)/)?.[1];
 }
 
-// Cuando la página carga
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("🔄 Inicializando página de disponibilidad...");
+// DOM Ready
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('✅ Página lista');
     cargarDisponibilidad();
     
-    document.getElementById('fechaConsulta').addEventListener('change', function() {
-        console.log("📅 Cambio de fecha:", this.value);
-        cargarDisponibilidad();
-    });
-    
+    document.getElementById('fechaConsulta').addEventListener('change', cargarDisponibilidad);
     document.getElementById('cancelarReserva').addEventListener('click', cerrarModal);
     document.getElementById('confirmarReserva').addEventListener('click', confirmarReserva);
 });
 
 // Cargar disponibilidad
-function cargarDisponibilidad() {
+async function cargarDisponibilidad() {
     const fecha = document.getElementById('fechaConsulta').value;
     const loading = document.getElementById('loading');
     const tabla = document.getElementById('cuerpoTabla');
     
-    console.log("🔄 Cargando disponibilidad para:", fecha);
+    if (!fecha) return;
     
     loading.style.display = 'block';
     tabla.innerHTML = '';
     
-    fetch(`/api/disponibilidad/?fecha=${fecha}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Error en la respuesta del servidor');
-            return response.json();
-        })
-        .then(data => {
-            console.log("📊 Datos recibidos:", data);
-            if (data.success) {
-                renderizarTabla(data.ocupadas || {});
-            } else {
-                console.error("❌ Error del servidor:", data.error);
-                renderizarTabla({});
-            }
-        })
-        .catch(error => {
-            console.error("❌ Error fetching:", error);
-            alert('Error al cargar la disponibilidad');
-            renderizarTabla({});
-        })
-        .finally(() => {
-            loading.style.display = 'none';
-        });
+    try {
+        const response = await fetch(`/api/disponibilidad/?fecha=${fecha}`);
+        const data = await response.json();
+        
+        if (data.success) {
+            renderizarTabla(data.ocupadas || {});
+        } else {
+            throw new Error(data.error || 'Error del servidor');
+        }
+    } catch (error) {
+        console.error('❌ Error:', error);
+        alert('Error al cargar la disponibilidad');
+        renderizarTabla({});
+    } finally {
+        loading.style.display = 'none';
+    }
 }
 
 // Renderizar tabla
 function renderizarTabla(ocupadas) {
-    const tabla = document.getElementById('cuerpoTabla');
+    const tbody = document.getElementById('cuerpoTabla');
     let html = '';
-    
-    console.log("🎨 Renderizando tabla con ocupadas:", ocupadas);
     
     horarios.forEach((horario, index) => {
         const horaId = index + 1;
-        html += `<tr style="border-bottom: 1px solid #ddd;">`;
-        html += `<td style="padding: 1rem; font-weight: bold;">${horario.replace('-', ' - ')}</td>`;
+        html += `<tr>`;
+        html += `<td><strong>${horario.replace('-', ' - ')}</strong></td>`;
         
         for (let cancha = 1; cancha <= 3; cancha++) {
             const celdaId = `celda-${horaId}-${cancha}`;
-            const canchaStr = cancha.toString();
-            const estaOcupada = ocupadas[horario] && ocupadas[horario].includes(canchaStr);
+            const estaOcupada = ocupadas[horario]?.includes(cancha.toString());
             
             if (estaOcupada) {
                 html += `
-                    <td id="${celdaId}" class="celda-ocupada" style="padding: 1rem; text-align: center;">
-                        <span style="background: #f8d7da; padding: 5px 10px; border-radius: 4px; display: inline-block;">❌ Ocupada</span>
+                    <td id="${celdaId}">
+                        <div class="badge badge-ocupada">⛔ Ocupada</div>
                     </td>
                 `;
             } else {
                 html += `
-                    <td id="${celdaId}" class="celda-disponible" 
-                        data-hora="${horario}" data-cancha="${cancha}"
-                        style="padding: 1rem; text-align: center; cursor: pointer;"
-                        onclick="reservarCancha('${horario}', ${cancha}, '${celdaId}')">
-                        <span style="background: #d4edda; padding: 5px 10px; border-radius: 4px; display: inline-block;">✅ Disponible</span>
+                    <td id="${celdaId}">
+                        <div class="badge badge-disponible"
+                             onclick="seleccionarCancha('${horario}', ${cancha}, '${celdaId}')">
+                            ✅ Disponible
+                        </div>
                     </td>
                 `;
             }
@@ -179,97 +621,90 @@ function renderizarTabla(ocupadas) {
         html += `</tr>`;
     });
     
-    tabla.innerHTML = html;
-    console.log("✅ Tabla renderizada");
+    tbody.innerHTML = html;
 }
 
-// Función para reservar
-function reservarCancha(hora, cancha, celdaId) {
-    console.log("🔄 Iniciando reserva:", {hora, cancha, celdaId});
-    
+// Seleccionar cancha
+function seleccionarCancha(hora, cancha, celdaId) {
     reservaActual = { hora, cancha, celdaId };
     
     const modal = document.getElementById('modalReserva');
     const detalle = document.getElementById('detalleReserva');
     
-    detalle.textContent = `Cancha ${cancha} - ${hora.replace('-', ' - ')}`;
-    modal.style.display = 'block';
-    
-    // Limpiar formulario
+    detalle.textContent = `Cancha ${cancha} • ${hora.replace('-', ' a ')}`;
+    modal.style.display = 'flex';
     document.getElementById('formDatosCliente').reset();
 }
 
+// Cerrar modal
 function cerrarModal() {
     document.getElementById('modalReserva').style.display = 'none';
     reservaActual = { hora: null, cancha: null, celdaId: null };
 }
 
-function confirmarReserva() {
+// Confirmar reserva
+async function confirmarReserva() {
     if (!reservaActual.celdaId) return;
     
-    // Validar formulario
     const nombre = document.getElementById('nombre').value.trim();
     const email = document.getElementById('email').value.trim();
     const telefono = document.getElementById('telefono').value.trim();
     
     if (!nombre || !email || !telefono) {
-        alert('❌ Por favor completá todos los campos');
+        alert('Por favor completa todos los campos obligatorios');
         return;
     }
     
+    const btn = document.getElementById('confirmarReserva');
+    const originalText = btn.innerHTML;
     const fecha = document.getElementById('fechaConsulta').value;
-    console.log("✅ Confirmando reserva:", {...reservaActual, fecha, nombre, email, telefono});
     
-    // Obtener el token CSRF
-    const csrftoken = getCookie('csrftoken');
+    btn.disabled = true;
+    btn.innerHTML = '<span>⏳ Procesando...</span>';
     
-    // Deshabilitar botón
-    const btnConfirmar = document.getElementById('confirmarReserva');
-    btnConfirmar.disabled = true;
-    btnConfirmar.textContent = 'Procesando...';
-    
-    fetch('/reservar/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken,
-        },
-        body: JSON.stringify({
-            hora: reservaActual.hora,
-            cancha: reservaActual.cancha,
-            fecha: fecha,
-            nombre: nombre,
-            email: email,
-            telefono: telefono
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("📨 Respuesta del servidor:", data);
+    try {
+        const response = await fetch('/reservar/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCSRFToken()
+            },
+            body: JSON.stringify({
+                hora: reservaActual.hora,
+                cancha: reservaActual.cancha,
+                fecha,
+                nombre,
+                email,
+                telefono
+            })
+        });
+        
+        const data = await response.json();
+        
         if (data.success && data.init_point) {
-            alert('✅ Redirigiendo a MercadoPago...');
-            // Redirigir a MercadoPago
-            window.location.href = data.init_point;
+            btn.innerHTML = '<span>✅ Redirigiendo...</span>';
+            setTimeout(() => {
+                window.location.href = data.init_point;
+            }, 1000);
         } else {
-            alert('❌ ' + data.message);
-            btnConfirmar.disabled = false;
-            btnConfirmar.textContent = 'Ir a Pagar';
+            throw new Error(data.message || 'Error en la reserva');
         }
-    })
-    .catch(error => {
+    } catch (error) {
         console.error('❌ Error:', error);
-        alert('❌ Error al realizar la reserva');
-        btnConfirmar.disabled = false;
-        btnConfirmar.textContent = 'Ir a Pagar';
-    });
+        alert('Error al procesar la reserva: ' + error.message);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
 }
 
 // Cerrar modal al hacer clic fuera
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('modalReserva');
-    if (event.target === modal) {
-        cerrarModal();
-    }
+window.addEventListener('click', (e) => {
+    if (e.target.id === 'modalReserva') cerrarModal();
+});
+
+// Cerrar con Escape
+document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') cerrarModal();
 });
 </script>
 {% endblock %}
