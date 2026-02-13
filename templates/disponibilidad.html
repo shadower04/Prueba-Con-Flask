@@ -3,291 +3,388 @@
 {% block title %}Disponibilidad - El Golazo{% endblock %}
 
 {% block content %}
-<div class="page-header">
+<!-- Page Header -->
+<section class="page-header">
     <div class="container">
         <h1>Disponibilidad de Canchas</h1>
         <p>Consulta los horarios disponibles para reservar</p>
     </div>
-</div>
+</section>
 
-<div class="container">
-    <div class="content-section">
-        <div class="form-group">
-            <label for="fechaConsulta">Seleccionar Fecha:</label>
-            <input type="date" id="fechaConsulta" name="fechaConsulta" value="{{ fecha_hoy }}">
-        </div>
+<!-- Disponibilidad Section -->
+<section class="disponibilidad-section">
+    <div class="container">
+        <div class="disponibilidad-container">
+            <!-- Selector de Fecha -->
+            <div class="fecha-selector">
+                <div class="fecha-header">
+                    <h2><i class="fas fa-calendar-alt"></i> Seleccionar Fecha</h2>
+                </div>
+                <div class="fecha-input-container">
+                    <label for="fecha-disponibilidad">
+                        <i class="fas fa-calendar-check"></i> Fecha:
+                    </label>
+                    <input type="date" id="fecha-disponibilidad" name="fecha" value="2026-02-11">
+                </div>
+            </div>
 
-        <div id="loading" style="display: none; text-align: center; padding: 2rem;">
-            <p>Cargando disponibilidad...</p>
-        </div>
+            <!-- Tabla de Disponibilidad -->
+            <div class="tabla-disponibilidad">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Hora</th>
+                            <th>Cancha 1</th>
+                            <th>Cancha 2</th>
+                            <th>Cancha 3</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="hora-cell">14:00 - 15:00</td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                        </tr>
+                        <tr>
+                            <td class="hora-cell">15:00 - 16:00</td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                        </tr>
+                        <tr>
+                            <td class="hora-cell">16:00 - 17:00</td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                        </tr>
+                        <tr>
+                            <td class="hora-cell">17:00 - 18:00</td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                        </tr>
+                        <tr>
+                            <td class="hora-cell">18:00 - 19:00</td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                            <td><span class="disponible-badge"><i class="fas fa-check-circle"></i> Disponible</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <div style="overflow-x: auto;">
-            <table id="tablaDisponibilidad" style="width: 100%; border-collapse: collapse; margin-top: 2rem;">
-                <thead>
-                    <tr style="background: #2a5298; color: white;">
-                        <th style="padding: 1rem; text-align: left;">Hora</th>
-                        <th style="padding: 1rem; text-align: center;">Cancha 1</th>
-                        <th style="padding: 1rem; text-align: center;">Cancha 2</th>
-                        <th style="padding: 1rem; text-align: center;">Cancha 3</th>
-                    </tr>
-                </thead>
-                <tbody id="cuerpoTabla">
-                    <!-- La tabla se cargará con JavaScript -->
-                </tbody>
-            </table>
+            <!-- Leyenda -->
+            <div class="leyenda-container">
+                <div class="leyenda-item">
+                    <span class="leyenda-badge disponible">
+                        <i class="fas fa-check-circle"></i> Disponible
+                    </span>
+                    <span class="leyenda-text">Horario disponible para reservar</span>
+                </div>
+                <div class="leyenda-item">
+                    <span class="leyenda-badge ocupado">
+                        <i class="fas fa-times-circle"></i> Ocupado
+                    </span>
+                    <span class="leyenda-text">Horario ya reservado</span>
+                </div>
+            </div>
+
+            <!-- Botón de acción -->
+            <div class="accion-container">
+                <a href="/reservar/" class="btn-reservar-ahora">
+                    <i class="fas fa-futbol"></i>
+                    <span>RESERVAR AHORA</span>
+                </a>
+            </div>
         </div>
     </div>
-</div>
+</section>
 
-<!-- Modal para confirmar reserva -->
-<div id="modalReserva" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000;">
-    <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 8px; width: 500px; max-width: 90%;">
-        <h3 style="margin-bottom: 1rem; color: #2a5298;">Datos de Reserva</h3>
-        <p id="detalleReserva" style="margin-bottom: 1.5rem; font-weight: bold; color: #333;"></p>
+<style>
+    /* ====== DISPONIBILIDAD PAGE STYLES ====== */
+    .disponibilidad-section {
+        padding: 60px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 400px);
+    }
+    
+    .disponibilidad-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+    
+    /* Selector de Fecha */
+    .fecha-selector {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 40px;
+    }
+    
+    .fecha-header {
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+        padding: 25px 30px;
+    }
+    
+    .fecha-header h2 {
+        color: white;
+        font-size: 1.5rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .fecha-input-container {
+        padding: 30px;
+    }
+    
+    .fecha-input-container label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #2a5298;
+        font-weight: 600;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+    
+    .fecha-input-container label i {
+        color: #ff6b35;
+        width: 20px;
+    }
+    
+    .fecha-input-container input[type="date"] {
+        width: 100%;
+        max-width: 300px;
+        padding: 16px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        font-weight: 500;
+    }
+    
+    .fecha-input-container input[type="date"]:focus {
+        outline: none;
+        border-color: #ff6b35;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+    }
+    
+    /* Tabla de Disponibilidad */
+    .tabla-disponibilidad {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 30px;
+    }
+    
+    .tabla-disponibilidad table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+    
+    .tabla-disponibilidad thead {
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+    }
+    
+    .tabla-disponibilidad th {
+        color: white;
+        padding: 20px 15px;
+        text-align: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        border-right: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .tabla-disponibilidad th:last-child {
+        border-right: none;
+    }
+    
+    .tabla-disponibilidad tbody tr {
+        border-bottom: 1px solid #e0e0e0;
+        transition: background 0.3s ease;
+    }
+    
+    .tabla-disponibilidad tbody tr:hover {
+        background: #f8f9fa;
+    }
+    
+    .tabla-disponibilidad tbody tr:last-child {
+        border-bottom: none;
+    }
+    
+    .tabla-disponibilidad td {
+        padding: 20px 15px;
+        text-align: center;
+        border-right: 1px solid #e0e0e0;
+    }
+    
+    .tabla-disponibilidad td:last-child {
+        border-right: none;
+    }
+    
+    .hora-cell {
+        background: #f8f9fa;
+        font-weight: 700;
+        color: #2a5298;
+        font-size: 1.05rem;
+    }
+    
+    .disponible-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        color: #28a745;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .disponible-badge i {
+        font-size: 1.1rem;
+    }
+    
+    /* Leyenda */
+    .leyenda-container {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 30px;
+        display: flex;
+        gap: 40px;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    .leyenda-item {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .leyenda-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 20px;
+        border-radius: 30px;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+    
+    .leyenda-badge.disponible {
+        background: #d4edda;
+        color: #28a745;
+        border: 2px solid #28a745;
+    }
+    
+    .leyenda-badge.ocupado {
+        background: #f8d7da;
+        color: #dc3545;
+        border: 2px solid #dc3545;
+    }
+    
+    .leyenda-text {
+        color: #666;
+        font-size: 0.95rem;
+    }
+    
+    /* Botón de acción */
+    .accion-container {
+        text-align: center;
+        margin-top: 40px;
+    }
+    
+    .btn-reservar-ahora {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        background: linear-gradient(135deg, #ff6b35, #ff8533);
+        color: white;
+        padding: 20px 50px;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 1.4rem;
+        transition: all 0.4s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        text-decoration: none;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    .btn-reservar-ahora:hover {
+        background: linear-gradient(135deg, #ff8533, #ff6b35);
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(255, 107, 53, 0.6);
+        text-decoration: none;
+        color: white;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .disponibilidad-section {
+            padding: 40px 0;
+        }
         
-        <div style="background: #e8f4f8; padding: 1rem; border-radius: 5px; margin-bottom: 1.5rem;">
-            <p style="margin: 0.5rem 0;"><strong>Precio total:</strong> $20.000</p>
-            <p style="margin: 0.5rem 0; color: #2a5298;"><strong>Seña a pagar (15%):</strong> $3.000</p>
-        </div>
-
-        <form id="formDatosCliente">
-            <div class="form-group">
-                <label for="nombre">Nombre completo *</label>
-                <input type="text" id="nombre" required style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
-            </div>
-            <div class="form-group">
-                <label for="email">Email *</label>
-                <input type="email" id="email" required style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
-            </div>
-            <div class="form-group">
-                <label for="telefono">Teléfono *</label>
-                <input type="tel" id="telefono" required placeholder="Ej: 1123456789" style="width: 100%; padding: 10px; border: 2px solid #e9ecef; border-radius: 5px;">
-            </div>
-        </form>
-
-        <div style="display: flex; gap: 1rem; justify-content: flex-end; margin-top: 1.5rem;">
-            <button id="cancelarReserva" class="btn" style="background: #6c757d;">Cancelar</button>
-            <button id="confirmarReserva" class="btn">Ir a Pagar</button>
-        </div>
-    </div>
-</div>
+        .fecha-header h2 {
+            font-size: 1.3rem;
+        }
+        
+        .fecha-input-container {
+            padding: 20px;
+        }
+        
+        .tabla-disponibilidad {
+            overflow-x: auto;
+        }
+        
+        .tabla-disponibilidad table {
+            min-width: 600px;
+        }
+        
+        .tabla-disponibilidad th,
+        .tabla-disponibilidad td {
+            padding: 15px 10px;
+            font-size: 0.9rem;
+        }
+        
+        .leyenda-container {
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .btn-reservar-ahora {
+            width: 100%;
+            font-size: 1.2rem;
+            padding: 18px 30px;
+        }
+    }
+</style>
 
 <script>
-// Variables globales
-let reservaActual = { hora: null, cancha: null, celdaId: null };
-const horarios = ['14:00-15:00', '15:00-16:00', '16:00-17:00', '17:00-18:00', '18:00-19:00'];
-
-// Función para obtener el CSRF token
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-// Cuando la página carga
-document.addEventListener('DOMContentLoaded', function() {
-    console.log("🔄 Inicializando página de disponibilidad...");
-    cargarDisponibilidad();
-    
-    document.getElementById('fechaConsulta').addEventListener('change', function() {
-        console.log("📅 Cambio de fecha:", this.value);
-        cargarDisponibilidad();
-    });
-    
-    document.getElementById('cancelarReserva').addEventListener('click', cerrarModal);
-    document.getElementById('confirmarReserva').addEventListener('click', confirmarReserva);
-});
-
-// Cargar disponibilidad
-function cargarDisponibilidad() {
-    const fecha = document.getElementById('fechaConsulta').value;
-    const loading = document.getElementById('loading');
-    const tabla = document.getElementById('cuerpoTabla');
-    
-    console.log("🔄 Cargando disponibilidad para:", fecha);
-    
-    loading.style.display = 'block';
-    tabla.innerHTML = '';
-    
-    fetch(`/api/disponibilidad/?fecha=${fecha}`)
-        .then(response => {
-            if (!response.ok) throw new Error('Error en la respuesta del servidor');
-            return response.json();
-        })
-        .then(data => {
-            console.log("📊 Datos recibidos:", data);
-            if (data.success) {
-                renderizarTabla(data.ocupadas || {});
-            } else {
-                console.error("❌ Error del servidor:", data.error);
-                renderizarTabla({});
-            }
-        })
-        .catch(error => {
-            console.error("❌ Error fetching:", error);
-            alert('Error al cargar la disponibilidad');
-            renderizarTabla({});
-        })
-        .finally(() => {
-            loading.style.display = 'none';
-        });
-}
-
-// Renderizar tabla
-function renderizarTabla(ocupadas) {
-    const tabla = document.getElementById('cuerpoTabla');
-    let html = '';
-    
-    console.log("🎨 Renderizando tabla con ocupadas:", ocupadas);
-    
-    horarios.forEach((horario, index) => {
-        const horaId = index + 1;
-        html += `<tr style="border-bottom: 1px solid #ddd;">`;
-        html += `<td style="padding: 1rem; font-weight: bold;">${horario.replace('-', ' - ')}</td>`;
+    document.addEventListener('DOMContentLoaded', function() {
+        const fechaInput = document.getElementById('fecha-disponibilidad');
         
-        for (let cancha = 1; cancha <= 3; cancha++) {
-            const celdaId = `celda-${horaId}-${cancha}`;
-            const canchaStr = cancha.toString();
-            const estaOcupada = ocupadas[horario] && ocupadas[horario].includes(canchaStr);
-            
-            if (estaOcupada) {
-                html += `
-                    <td id="${celdaId}" class="celda-ocupada" style="padding: 1rem; text-align: center;">
-                        <span style="background: #f8d7da; padding: 5px 10px; border-radius: 4px; display: inline-block;">❌ Ocupada</span>
-                    </td>
-                `;
-            } else {
-                html += `
-                    <td id="${celdaId}" class="celda-disponible" 
-                        data-hora="${horario}" data-cancha="${cancha}"
-                        style="padding: 1rem; text-align: center; cursor: pointer;"
-                        onclick="reservarCancha('${horario}', ${cancha}, '${celdaId}')">
-                        <span style="background: #d4edda; padding: 5px 10px; border-radius: 4px; display: inline-block;">✅ Disponible</span>
-                    </td>
-                `;
-            }
-        }
-        html += `</tr>`;
-    });
-    
-    tabla.innerHTML = html;
-    console.log("✅ Tabla renderizada");
-}
-
-// Función para reservar
-function reservarCancha(hora, cancha, celdaId) {
-    console.log("🔄 Iniciando reserva:", {hora, cancha, celdaId});
-    
-    reservaActual = { hora, cancha, celdaId };
-    
-    const modal = document.getElementById('modalReserva');
-    const detalle = document.getElementById('detalleReserva');
-    
-    detalle.textContent = `Cancha ${cancha} - ${hora.replace('-', ' - ')}`;
-    modal.style.display = 'block';
-    
-    // Limpiar formulario
-    document.getElementById('formDatosCliente').reset();
-}
-
-function cerrarModal() {
-    document.getElementById('modalReserva').style.display = 'none';
-    reservaActual = { hora: null, cancha: null, celdaId: null };
-}
-
-function confirmarReserva() {
-    if (!reservaActual.celdaId) return;
-    
-    // Validar formulario
-    const nombre = document.getElementById('nombre').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const telefono = document.getElementById('telefono').value.trim();
-    
-    if (!nombre || !email || !telefono) {
-        alert('❌ Por favor completá todos los campos');
-        return;
-    }
-    
-    const fecha = document.getElementById('fechaConsulta').value;
-    console.log("✅ Confirmando reserva:", {...reservaActual, fecha, nombre, email, telefono});
-    
-    // Obtener el token CSRF
-    const csrftoken = getCookie('csrftoken');
-    
-    // Deshabilitar botón
-    const btnConfirmar = document.getElementById('confirmarReserva');
-    const btnOriginalText = btnConfirmar.textContent; // Guardar texto original
-    btnConfirmar.disabled = true;
-    btnConfirmar.textContent = 'Procesando...';
-    
-    fetch('/reservar/', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRFToken': csrftoken,
-        },
-        body: JSON.stringify({
-            hora: reservaActual.hora,
-            cancha: reservaActual.cancha,
-            fecha: fecha,
-            nombre: nombre,
-            email: email,
-            telefono: telefono
-        })
-    })
-    .then(response => {
-        console.log("📊 Status de respuesta:", response.status);
-        console.log("📊 Headers:", response.headers);
-        return response.json().catch(err => {
-            console.error("❌ Error parseando JSON:", err);
-            throw new Error('Respuesta no es JSON válido');
-        });
-    })
-    .then(data => {
-        console.log("📨 Respuesta COMPLETA del servidor:", data);
+        // Establecer fecha mínima como hoy
+        const today = new Date().toISOString().split('T')[0];
+        fechaInput.min = today;
         
-        if (data.success && data.init_point) {
-            console.log("🌐 URL de MercadoPago recibida:", data.init_point);
-            
-            // Verificar que sea una URL válida
-            if (data.init_point.startsWith('http')) {
-                // Redirigir inmediatamente
-                window.location.href = data.init_point;
-            } else {
-                alert('❌ URL de pago inválida');
-                btnConfirmar.disabled = false;
-                btnConfirmar.textContent = btnOriginalText;
-            }
-            
-        } else {
-            console.error("❌ Error en respuesta:", data);
-            alert('❌ ' + (data.message || 'No se pudo crear el pago'));
-            btnConfirmar.disabled = false;
-            btnConfirmar.textContent = btnOriginalText;
-        }
-    })
-    .catch(error => {
-        console.error('❌ Error de red o servidor:', error);
-        alert('❌ Error al conectar con el servidor: ' + error.message);
-        btnConfirmar.disabled = false;
-        btnConfirmar.textContent = btnOriginalText;
+        // Aquí puedes agregar lógica para cargar disponibilidad cuando cambie la fecha
+        fechaInput.addEventListener('change', function() {
+            // TODO: Cargar disponibilidad desde el backend
+            console.log('Fecha seleccionada:', this.value);
+        });
     });
-}
-
-window.addEventListener('click', function(event) {
-    const modal = document.getElementById('modalReserva');
-    if (event.target === modal) {
-        cerrarModal();
-    }
-});
 </script>
 {% endblock %}

@@ -1,0 +1,318 @@
+{% extends "base.html" %}
+
+{% block title %}Registro - Cancha 5 "El Golazo"{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Crear Cuenta</h1>
+    <p>Regístrate para comenzar a reservar tu cancha</p>
+</div>
+
+<div class="container" style="padding-bottom: 80px;">
+    <div class="auth-container">
+        <div class="auth-card">
+            <div class="auth-icon">🎯</div>
+            <h2>¡Únete a nosotros!</h2>
+            <p class="auth-subtitle">Completa tus datos para crear tu cuenta</p>
+            
+            <form method="POST" action="{% url 'register' %}" class="auth-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="id_username">Nombre de Usuario</label>
+                    {{ form.username }}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_first_name">Nombre</label>
+                        {{ form.first_name }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_last_name">Apellido</label>
+                        {{ form.last_name }}
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="id_email">Correo Electrónico</label>
+                    {{ form.email }}
+                </div>
+
+                <div class="form-group">
+                    <label for="id_telefono">Teléfono</label>
+                    {{ form.telefono }}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="id_password1">Contraseña</label>
+                        {{ form.password1 }}
+                    </div>
+
+                    <div class="form-group">
+                        <label for="id_password2">Confirmar Contraseña</label>
+                        {{ form.password2 }}
+                    </div>
+                </div>
+
+                <div class="password-strength">
+                    <div class="strength-bar">
+                        <div class="strength-fill"></div>
+                    </div>
+                    <p class="strength-text">Usa al menos 6 caracteres</p>
+                </div>
+
+                <div class="form-group-checkbox">
+                    <label class="checkbox-container">
+                        {{ form.terms }}
+                        <span>Acepto los <a href="#" class="link-primary">términos y condiciones</a> y la <a href="#" class="link-primary">política de privacidad</a></span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-full">Crear Cuenta</button>
+            </form>
+
+            <div class="auth-divider">
+                <span>O</span>
+            </div>
+
+            <div class="auth-footer">
+                <p>¿Ya tienes una cuenta? <a href="{% url 'login' %}" class="link-primary">Inicia sesión aquí</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .auth-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 60vh;
+    }
+
+    .auth-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        padding: 3rem;
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .auth-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .auth-card h2 {
+        color: #2a5298;
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .auth-subtitle {
+        color: #666;
+        margin-bottom: 2rem;
+    }
+
+    .auth-form {
+        text-align: left;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .auth-form .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .auth-form label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2a5298;
+    }
+
+    .auth-form input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s;
+    }
+
+    .auth-form input:focus {
+        outline: none;
+        border-color: #ff6b35;
+        box-shadow: 0 0 0 3px rgba(255,107,53,0.1);
+    }
+
+    .password-strength {
+        margin-bottom: 1.5rem;
+    }
+
+    .strength-bar {
+        height: 4px;
+        background: #e9ecef;
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .strength-fill {
+        height: 100%;
+        width: 0%;
+        background: #e9ecef;
+        transition: all 0.3s;
+    }
+
+    .strength-text {
+        font-size: 0.85rem;
+        color: #999;
+    }
+
+    .form-group-checkbox {
+        margin-bottom: 1.5rem;
+    }
+
+    .checkbox-container {
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        cursor: pointer;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .checkbox-container input[type="checkbox"] {
+        width: auto;
+        margin-top: 3px;
+        cursor: pointer;
+        flex-shrink: 0;
+    }
+
+    .btn-full {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.1rem;
+    }
+
+    .auth-divider {
+        margin: 2rem 0;
+        position: relative;
+        text-align: center;
+    }
+
+    .auth-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: #e9ecef;
+    }
+
+    .auth-divider span {
+        background: white;
+        padding: 0 1rem;
+        color: #999;
+        position: relative;
+        z-index: 1;
+    }
+
+    .auth-footer {
+        margin-top: 1.5rem;
+    }
+
+    .auth-footer p {
+        color: #666;
+    }
+
+    .link-primary {
+        color: #ff6b35;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s;
+    }
+
+    .link-primary:hover {
+        color: #e55a2b;
+    }
+
+    @media (max-width: 768px) {
+        .auth-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    // Validación de contraseñas
+    const password = document.getElementById('id_password1');
+    const confirmPassword = document.getElementById('id_password2');
+    const strengthFill = document.querySelector('.strength-fill');
+    const strengthText = document.querySelector('.strength-text');
+
+    if (password && confirmPassword) {
+        password.addEventListener('input', function() {
+            const value = this.value;
+            let strength = 0;
+            let strengthLabel = '';
+            let color = '';
+
+            if (value.length >= 6) strength++;
+            if (value.length >= 10) strength++;
+            if (/[a-z]/.test(value) && /[A-Z]/.test(value)) strength++;
+            if (/[0-9]/.test(value)) strength++;
+            if (/[^a-zA-Z0-9]/.test(value)) strength++;
+
+            const percentage = (strength / 5) * 100;
+            strengthFill.style.width = percentage + '%';
+
+            if (strength <= 1) {
+                color = '#dc3545';
+                strengthLabel = 'Débil';
+            } else if (strength <= 3) {
+                color = '#ffc107';
+                strengthLabel = 'Media';
+            } else {
+                color = '#28a745';
+                strengthLabel = 'Fuerte';
+            }
+
+            strengthFill.style.background = color;
+            strengthText.textContent = value.length > 0 ? 'Fortaleza: ' + strengthLabel : 'Usa al menos 6 caracteres';
+            strengthText.style.color = color;
+        });
+
+        // Validar que las contraseñas coincidan
+        confirmPassword.addEventListener('input', function() {
+            if (this.value !== password.value) {
+                this.setCustomValidity('Las contraseñas no coinciden');
+            } else {
+                this.setCustomValidity('');
+            }
+        });
+
+        document.querySelector('.auth-form').addEventListener('submit', function(e) {
+            if (password.value !== confirmPassword.value) {
+                e.preventDefault();
+                alert('Las contraseñas no coinciden. Por favor, verifica.');
+            }
+        });
+    }
+</script>
+{% endblock %}

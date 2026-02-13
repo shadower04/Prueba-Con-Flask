@@ -4,10 +4,22 @@ from . import views
 urlpatterns = [
     # Páginas principales
     path('', views.index, name='index'),
+     # Autenticación
+    path('register/', views.register_view, name='register'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
+    
+    # Recuperación de contraseña
+    path('forgot-password/', views.forgot_password_view, name='forgot_password'),
+    
+    # Perfil de usuario
+    path('perfil/', views.perfil_view, name='perfil'),
     path('disponibilidad/', views.disponibilidad, name='disponibilidad'),
     path('contacto/', views.contacto, name='contacto'),
     path('reservas/', views.reservas, name='reservas'),
     path('admin-login/', views.admin_login, name='admin_login'),
+    path('admin-panel/', views.admin_panel, name='admin_panel'),  # ← AGREGAR ESTA
+    path('admin-logout/', views.admin_logout, name='admin_logout'),  # ← AGREGAR ESTA
     
     # API
     path('api/disponibilidad/', views.api_disponibilidad, name='api_disponibilidad'),
@@ -23,6 +35,4 @@ urlpatterns = [
     # Pruebas
     path('test-pdf/<int:reserva_id>/', views.test_pdf, name='test_pdf'),
     path('test-email/<int:reserva_id>/', views.test_enviar_email, name='test_email'),
-    path("admin-panel/", views.admin_panel, name="admin_panel"),
-    path("admin-logout/", views.admin_logout, name="admin_logout"),
 ]

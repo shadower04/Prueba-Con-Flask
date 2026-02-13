@@ -16,6 +16,135 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum, Count
+from django.contrib.auth import login, authenticate, logout
+from django.views.decorators.http import require_http_methods
+from .forms import RegistroForm, LoginForm
+from .models import Usuario
+
+@require_http_methods(["GET", "POST"])
+def register_view(request):
+    """
+    Vista para el registro de nuevos usuarios
+    """
+    # Si el usuario ya está autenticado, redirigir al inicio
+    if request.user.is_authenticated:
+        messages.info(request, 'Ya tienes una sesión iniciada.')
+        return redirect('index')
+    
+    if request.method == 'POST':
+        form = RegistroForm(request.POST)
+        if form.is_valid():
+            # Guardar el nuevo usuario
+            user = form.save()
+            
+            # Autenticar y hacer login automáticamente
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'¡Bienvenido {user.get_nombre_completo()}! Tu cuenta ha sido creada exitosamente.')
+                return redirect('index')
+        else:
+            # Mostrar errores del formulario
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{error}')
+    else:
+        form = RegistroForm()
+    
+    context = {
+        'form': form,
+        'title': 'Registro'
+    }
+    return render(request, 'register.html', context)
+
+@require_http_methods(["GET", "POST"])
+def login_view(request):
+    """
+    Vista para el login de usuarios
+    """
+    # Si el usuario ya está autenticado, redirigir al inicio
+    if request.user.is_authenticated:
+        messages.info(request, 'Ya tienes una sesión iniciada.')
+        return redirect('index')
+    
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            remember_me = form.cleaned_data.get('remember_me')
+            
+            # Intentar autenticar con username
+            user = authenticate(username=username, password=password)
+            
+            # Si no funciona, intentar con email
+            if user is None:
+                try:
+                    usuario_obj = Usuario.objects.get(email=username)
+                    user = authenticate(username=usuario_obj.username, password=password)
+                except Usuario.DoesNotExist:
+                    pass
+            
+            if user is not None:
+                login(request, user)
+                
+                # Configurar duración de la sesión
+                if not remember_me:
+                    # Sesión expira al cerrar el navegador
+                    request.session.set_expiry(0)
+                else:
+                    # Sesión expira en 2 semanas
+                    request.session.set_expiry(1209600)  # 2 semanas en segundos
+                
+                messages.success(request, f'¡Bienvenido de vuelta, {user.get_nombre_completo()}!')
+                
+                # Redirigir a la página que intentaba acceder o al inicio
+                next_page = request.GET.get('next', 'index')
+                return redirect(next_page)
+            else:
+                messages.error(request, 'Usuario o contraseña incorrectos.')
+        else:
+            messages.error(request, 'Usuario o contraseña incorrectos.')
+    else:
+        form = LoginForm()
+    
+    context = {
+        'form': form,
+        'title': 'Iniciar Sesión'
+    }
+    return render(request, 'login.html', context)
+
+@login_required
+def logout_view(request):
+    """
+    Vista para cerrar sesión
+    """
+    nombre_usuario = request.user.get_nombre_completo()
+    logout(request)
+    messages.success(request, f'¡Hasta pronto, {nombre_usuario}! Has cerrado sesión exitosamente.')
+    return redirect('login')
+
+@login_required
+def perfil_view(request):
+    """
+    Vista del perfil del usuario (opcional)
+    """
+    context = {
+        'user': request.user,
+        'title': 'Mi Perfil'
+    }
+    return render(request, 'perfil.html', context)
+
+
+def forgot_password_view(request):
+    """
+    Vista para recuperación de contraseña (placeholder)
+    """
+    messages.info(request, 'La funcionalidad de recuperación de contraseña estará disponible próximamente.')
+    return redirect('login')
 
 # ==========================
 # CONFIGURACIÓN INICIAL
@@ -42,19 +171,32 @@ def admin_login(request):
         usuario = request.POST.get('usuario')
         password = request.POST.get('password')
         
-        print(f"🔐 Intento de login - Usuario: {usuario}")
+        print(f"\n{'='*50}")
+        print(f"🔐 INTENTO DE LOGIN")
+        print(f"Usuario recibido: '{usuario}'")
+        print(f"Password recibido: {'*' * len(password)}")
+        print(f"{'='*50}\n")
         
         user = authenticate(request, username=usuario, password=password)
         
-        if user is not None and user.is_staff:
-            login(request, user)
-            print(f"✅ Login exitoso para {usuario}")
-            return redirect('admin_panel')
+        if user is not None:
+            print(f"✅ Usuario autenticado: {user.username}")
+            print(f"   is_staff: {user.is_staff}")
+            print(f"   is_superuser: {user.is_superuser}")
+            
+            if user.is_staff:
+                login(request, user)
+                print(f"✅ Login exitoso - Redirigiendo a admin_panel")
+                return redirect('admin_panel')
+            else:
+                print(f"❌ Usuario NO es staff")
+                messages.error(request, '❌ No tenés permisos de administrador')
         else:
-            print(f"❌ Login fallido para {usuario}")
+            print(f"❌ Autenticación fallida - Usuario o contraseña incorrectos")
             messages.error(request, '❌ Usuario o contraseña incorrectos')
     
     return render(request, 'admin_login.html')
+
 @login_required
 def admin_panel(request):
     """Panel de administración"""
@@ -273,14 +415,13 @@ Cancha 5 "El Golazo"
     except Exception as e:
         print(f"❌ ERROR en enviar_email_confirmacion: {str(e)}")
         return False
-
+    
 # ==========================
 # VISTAS DE PÁGINAS (HTML)
 # ==========================
-def admin_login(request):
-    return render(request, "admin_login.html")
 
 def index(request):
+    """Página principal"""
     CANCHAS_DISPONIBLES = [
         {'id': 1, 'nombre': 'Cancha 1'},
         {'id': 2, 'nombre': 'Cancha 2'}, 
@@ -291,9 +432,11 @@ def index(request):
     })
 
 def contacto(request):
+    """Página de contacto"""
     return render(request, "contacto.html")
 
 def disponibilidad(request):
+    """Página de disponibilidad"""
     return render(request, "disponibilidad.html", {
         "fecha_hoy": date.today().isoformat()
     })
@@ -603,6 +746,7 @@ def webhook_mercadopago(request):
             return JsonResponse({"success": False, "error": str(e)})
     
     return JsonResponse({"success": False, "error": "Método no permitido"})
+
 
 # ==========================
 # VISTAS DE PAGO

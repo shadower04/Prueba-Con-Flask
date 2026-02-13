@@ -9,9 +9,9 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+import os
 from pathlib import Path
-
+from dotenv import load_dotenv
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -122,10 +122,6 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MERCADOPAGO = {
-    'ACCESS_TOKEN': 'APP_USR-5841245844373772-121617-855bd24cb249e2cdcbd48688a448049f-2974538585',  # Tu token real
-}
-
 SITE_URL = 'http://127.0.0.1:8000'  # O tu dominio
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
@@ -135,3 +131,25 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'maxialzogaray700@gmail.com'  # Tu email
 EMAIL_HOST_PASSWORD = 'jlae utpw edqu nboq'  # La contraseña de app
 DEFAULT_FROM_EMAIL = 'maxialzogaray700@gmail.com'
+
+# Al final de settings.py
+MERCADOPAGO = {
+    'ACCESS_TOKEN': 'APP_USR-5841245844373772-121617-855bd24cb249e2cdcbd48688a448049f-2974538585',
+}
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
+# Modelo de usuario personalizado (IMPORTANTE: Agregar ANTES de la primera migración)
+AUTH_USER_MODEL = 'cancha_reservas.Usuario'  # Reemplaza 'tu_app' por el nombre real de tu app
+
+# URLs de redirección
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'index'
+LOGOUT_REDIRECT_URL = 'index'
+
+# Configuración de sesiones
+SESSION_COOKIE_AGE = 1209600  # 2 semanas
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

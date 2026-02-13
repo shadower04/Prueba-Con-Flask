@@ -5,3 +5,5 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("", include("cancha_reservar.urls")),
 ]
+
+#esto va en urls.py

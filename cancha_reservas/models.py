@@ -1,5 +1,52 @@
 # models.py COMPLETO
+from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.core.validators import RegexValidator
+
+class Usuario(AbstractUser):
+    """
+    Modelo de usuario personalizado que extiende AbstractUser
+    """
+    telefono_regex = RegexValidator(
+        regex=r'^\+?1?\d{9,15}$',
+        message="El número de teléfono debe estar en el formato: '+999999999'. Hasta 15 dígitos permitidos."
+    )
+    
+    telefono = models.CharField(
+        validators=[telefono_regex],
+        max_length=17,
+        blank=True,
+        null=True,
+        verbose_name="Teléfono"
+    )
+    
+    fecha_registro = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Fecha de registro"
+    )
+    
+    ultima_actualizacion = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Última actualización"
+    )
+    
+    email_verificado = models.BooleanField(
+        default=False,
+        verbose_name="Email verificado"
+    )
+    
+    class Meta:
+        verbose_name = "Usuario"
+        verbose_name_plural = "Usuarios"
+        ordering = ['-fecha_registro']
+    
+    def __str__(self):
+        return f"{self.get_full_name()} ({self.username})"
+    
+    def get_nombre_completo(self):
+        """Retorna el nombre completo del usuario"""
+        return f"{self.first_name} {self.last_name}".strip() or self.username
+
 
 class Reserva(models.Model):
     fecha = models.DateField()
