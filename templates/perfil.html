@@ -2,120 +2,9 @@
 
 {% block title %}Mi Perfil - Cancha 5 "El Golazo"{% endblock %}
 
-{% block content %}
-<div class="page-header">
-    <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
-    <p>Gestiona tu información personal y configuración</p>
-</div>
-
-<div class="container" style="padding: 60px 20px;">
-    <div class="profile-container">
-        <!-- Tarjeta de información del usuario -->
-        <div class="profile-card">
-            <div class="profile-header">
-                <div class="profile-avatar">
-                    <i class="fas fa-user-circle"></i>
-                </div>
-                <div class="profile-info">
-                    <h2>{{ user.get_nombre_completo }}</h2>
-                    <p class="username">@{{ user.username }}</p>
-                    {% if user.is_staff %}
-                        <span class="badge badge-admin"><i class="fas fa-crown"></i> Administrador</span>
-                    {% else %}
-                        <span class="badge badge-user"><i class="fas fa-user"></i> Usuario</span>
-                    {% endif %}
-                </div>
-            </div>
-
-            <div class="profile-body">
-                <div class="info-section">
-                    <h3><i class="fas fa-info-circle"></i> Información Personal</h3>
-                    <div class="info-grid">
-                        <div class="info-item">
-                            <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
-                            <p>{{ user.email }}</p>
-                        </div>
-
-                        <div class="info-item">
-                            <label><i class="fas fa-phone"></i> Teléfono</label>
-                            <p>{{ user.telefono|default:"No especificado" }}</p>
-                        </div>
-
-                        <div class="info-item">
-                            <label><i class="fas fa-user"></i> Nombre</label>
-                            <p>{{ user.first_name }} {{ user.last_name }}</p>
-                        </div>
-
-                        <div class="info-item">
-                            <label><i class="fas fa-calendar-alt"></i> Miembro desde</label>
-                            <p>{{ user.fecha_registro|date:"d/m/Y" }}</p>
-                        </div>
-
-                        <div class="info-item">
-                            <label><i class="fas fa-clock"></i> Última actualización</label>
-                            <p>{{ user.ultima_actualizacion|date:"d/m/Y H:i" }}</p>
-                        </div>
-
-                        <div class="info-item">
-                            <label><i class="fas fa-sign-in-alt"></i> Último acceso</label>
-                            <p>{{ user.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="info-section">
-                    <h3><i class="fas fa-shield-alt"></i> Estado de la Cuenta</h3>
-                    <div class="status-grid">
-                        <div class="status-item {% if user.is_active %}status-active{% else %}status-inactive{% endif %}">
-                            <i class="fas fa-check-circle"></i>
-                            <span>Cuenta {{ user.is_active|yesno:"Activa,Inactiva" }}</span>
-                        </div>
-
-                        <div class="status-item {% if user.email_verificado %}status-active{% else %}status-warning{% endif %}">
-                            <i class="fas fa-envelope-open-text"></i>
-                            <span>Email {{ user.email_verificado|yesno:"Verificado,No Verificado" }}</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="profile-actions">
-                    <a href="#" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> Editar Perfil
-                    </a>
-                    <a href="#" class="btn btn-secondary">
-                        <i class="fas fa-key"></i> Cambiar Contraseña
-                    </a>
-                    <a href="{% url 'logout' %}" class="btn btn-danger">
-                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
-                    </a>
-                </div>
-            </div>
-        </div>
-
-        <!-- Tarjeta de actividad reciente (opcional) -->
-        <div class="activity-card">
-            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
-            <div class="activity-list">
-                <div class="activity-item">
-                    <i class="fas fa-calendar-check"></i>
-                    <div>
-                        <p><strong>Próximas reservas</strong></p>
-                        <small>No tienes reservas pendientes</small>
-                    </div>
-                </div>
-                <div class="activity-item">
-                    <i class="fas fa-history"></i>
-                    <div>
-                        <p><strong>Historial de reservas</strong></p>
-                        <small>Ver todas las reservas anteriores</small>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_styles %}
 <style>
+    /* ====== PERFIL PAGE STYLES ====== */
     .profile-container {
         display: grid;
         grid-template-columns: 2fr 1fr;
@@ -124,7 +13,8 @@
         margin: 0 auto;
     }
 
-    .profile-card, .activity-card {
+    .profile-card,
+    .activity-card {
         background: white;
         border-radius: 15px;
         box-shadow: 0 10px 40px rgba(0,0,0,0.1);
@@ -140,23 +30,11 @@
         gap: 2rem;
     }
 
-    .profile-avatar {
-        font-size: 6rem;
-        color: rgba(255,255,255,0.9);
-        line-height: 1;
-    }
+    .profile-avatar { font-size: 6rem; color: rgba(255,255,255,0.9); line-height: 1; }
 
-    .profile-info h2 {
-        font-size: 2rem;
-        margin-bottom: 0.5rem;
-        font-weight: 700;
-    }
+    .profile-info h2 { font-size: 2rem; margin-bottom: 0.5rem; font-weight: 700; }
 
-    .username {
-        color: rgba(255,255,255,0.8);
-        font-size: 1.1rem;
-        margin-bottom: 1rem;
-    }
+    .username { color: rgba(255,255,255,0.8); font-size: 1.1rem; margin-bottom: 1rem; }
 
     .badge {
         display: inline-flex;
@@ -168,23 +46,12 @@
         font-weight: 600;
     }
 
-    .badge-admin {
-        background: linear-gradient(135deg, #ff6b35, #ff8533);
-        color: white;
-    }
+    .badge-admin { background: linear-gradient(135deg, #ff6b35, #ff8533); color: white; }
+    .badge-user  { background: rgba(255,255,255,0.2); color: white; }
 
-    .badge-user {
-        background: rgba(255,255,255,0.2);
-        color: white;
-    }
+    .profile-body { padding: 2.5rem; }
 
-    .profile-body {
-        padding: 2.5rem;
-    }
-
-    .info-section {
-        margin-bottom: 2.5rem;
-    }
+    .info-section { margin-bottom: 2.5rem; }
 
     .info-section h3 {
         color: #2a5298;
@@ -219,15 +86,8 @@
         margin-bottom: 0.5rem;
     }
 
-    .info-item label i {
-        color: #ff6b35;
-    }
-
-    .info-item p {
-        color: #333;
-        font-size: 1.05rem;
-        font-weight: 500;
-    }
+    .info-item label i { color: #ff6b35; }
+    .info-item p { color: #333; font-size: 1.05rem; font-weight: 500; }
 
     .status-grid {
         display: grid;
@@ -244,24 +104,10 @@
         font-weight: 600;
     }
 
-    .status-active {
-        background: #d4edda;
-        color: #155724;
-    }
-
-    .status-inactive {
-        background: #f8d7da;
-        color: #721c24;
-    }
-
-    .status-warning {
-        background: #fff3cd;
-        color: #856404;
-    }
-
-    .status-item i {
-        font-size: 1.5rem;
-    }
+    .status-active   { background: #d4edda; color: #155724; }
+    .status-inactive { background: #f8d7da; color: #721c24; }
+    .status-warning  { background: #fff3cd; color: #856404; }
+    .status-item i   { font-size: 1.5rem; }
 
     .profile-actions {
         display: flex;
@@ -272,34 +118,17 @@
         border-top: 2px solid #e9ecef;
     }
 
-    .btn-primary {
-        background: linear-gradient(135deg, #2a5298, #1e3c72);
-    }
+    .btn-primary     { background: linear-gradient(135deg, #2a5298, #1e3c72); }
+    .btn-primary:hover { background: linear-gradient(135deg, #1e3c72, #2a5298); }
 
-    .btn-primary:hover {
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
-    }
+    .btn-secondary   { background: linear-gradient(135deg, #6c757d, #5a6268); }
+    .btn-secondary:hover { background: linear-gradient(135deg, #5a6268, #6c757d); }
 
-    .btn-secondary {
-        background: linear-gradient(135deg, #6c757d, #5a6268);
-    }
-
-    .btn-secondary:hover {
-        background: linear-gradient(135deg, #5a6268, #6c757d);
-    }
-
-    .btn-danger {
-        background: linear-gradient(135deg, #dc3545, #c82333);
-    }
-
-    .btn-danger:hover {
-        background: linear-gradient(135deg, #c82333, #bd2130);
-    }
+    .btn-danger      { background: linear-gradient(135deg, #dc3545, #c82333); }
+    .btn-danger:hover { background: linear-gradient(135deg, #c82333, #bd2130); }
 
     /* Activity Card */
-    .activity-card {
-        padding: 2rem;
-    }
+    .activity-card { padding: 2rem; }
 
     .activity-card h3 {
         color: #2a5298;
@@ -311,11 +140,7 @@
         font-weight: 700;
     }
 
-    .activity-list {
-        display: flex;
-        flex-direction: column;
-        gap: 1rem;
-    }
+    .activity-list { display: flex; flex-direction: column; gap: 1rem; }
 
     .activity-item {
         display: flex;
@@ -327,59 +152,164 @@
         transition: all 0.3s ease;
     }
 
-    .activity-item:hover {
-        background: #e9ecef;
-        transform: translateX(5px);
-    }
-
-    .activity-item i {
-        font-size: 1.5rem;
-        color: #ff6b35;
-        margin-top: 0.2rem;
-    }
-
-    .activity-item p {
-        margin: 0;
-        color: #333;
-    }
-
-    .activity-item small {
-        color: #6c757d;
-    }
+    .activity-item:hover  { background: #e9ecef; transform: translateX(5px); }
+    .activity-item i      { font-size: 1.5rem; color: #ff6b35; margin-top: 0.2rem; }
+    .activity-item p      { margin: 0; color: #333; }
+    .activity-item small  { color: #6c757d; }
 
     /* Responsive */
     @media (max-width: 992px) {
-        .profile-container {
-            grid-template-columns: 1fr;
-        }
+        .profile-container { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 768px) {
-        .profile-header {
-            flex-direction: column;
-            text-align: center;
-            padding: 2rem 1.5rem;
-        }
-
-        .profile-avatar {
-            font-size: 5rem;
-        }
-
-        .profile-body {
-            padding: 1.5rem;
-        }
-
-        .info-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .profile-actions {
-            flex-direction: column;
-        }
-
-        .profile-actions .btn {
-            width: 100%;
-        }
+        .profile-header   { flex-direction: column; text-align: center; padding: 2rem 1.5rem; }
+        .profile-avatar   { font-size: 5rem; }
+        .profile-body     { padding: 1.5rem; }
+        .info-grid        { grid-template-columns: 1fr; }
+        .profile-actions  { flex-direction: column; }
+        .profile-actions .btn { width: 100%; }
     }
+
+    /* ====== DARK MODE — PERFIL ====== */
+    body.dark-mode .profile-card,
+    body.dark-mode .activity-card {
+        background: #1e1e1e;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    }
+
+    body.dark-mode .info-section h3   { color: #90b4f5; }
+    body.dark-mode .activity-card h3  { color: #90b4f5; }
+
+    body.dark-mode .info-item {
+        background: #2a2a2a;
+        border-left-color: #ff6b35;
+    }
+
+    body.dark-mode .info-item label   { color: #aaaaaa; }
+    body.dark-mode .info-item p       { color: #e0e0e0; }
+
+    body.dark-mode .profile-actions   { border-color: #333; }
+
+    /* Status badges */
+    body.dark-mode .status-active    { background: #1a3a1a; color: #5cd47a; }
+    body.dark-mode .status-inactive  { background: #3a1a1a; color: #f08080; }
+    body.dark-mode .status-warning   { background: #3a3000; color: #ffd85a; }
+
+    /* Activity items */
+    body.dark-mode .activity-item        { background: #252525; }
+    body.dark-mode .activity-item:hover  { background: #2e2e2e; }
+    body.dark-mode .activity-item p      { color: #e0e0e0; }
+    body.dark-mode .activity-item small  { color: #888; }
 </style>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1><i class="fas fa-user-circle"></i> Mi Perfil</h1>
+    <p>Gestiona tu información personal y configuración</p>
+</div>
+
+<div class="container" style="padding: 60px 20px;">
+    <div class="profile-container">
+
+        <!-- Tarjeta de información del usuario -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="profile-avatar">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="profile-info">
+                    <h2>{{ user.get_nombre_completo }}</h2>
+                    <p class="username">@{{ user.username }}</p>
+                    {% if user.is_staff %}
+                        <span class="badge badge-admin"><i class="fas fa-crown"></i> Administrador</span>
+                    {% else %}
+                        <span class="badge badge-user"><i class="fas fa-user"></i> Usuario</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="profile-body">
+                <div class="info-section">
+                    <h3><i class="fas fa-info-circle"></i> Información Personal</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <label><i class="fas fa-envelope"></i> Correo Electrónico</label>
+                            <p>{{ user.email }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-phone"></i> Teléfono</label>
+                            <p>{{ user.telefono|default:"No especificado" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-user"></i> Nombre</label>
+                            <p>{{ user.first_name }} {{ user.last_name }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-calendar-alt"></i> Miembro desde</label>
+                            <p>{{ user.fecha_registro|date:"d/m/Y" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-clock"></i> Última actualización</label>
+                            <p>{{ user.ultima_actualizacion|date:"d/m/Y H:i" }}</p>
+                        </div>
+                        <div class="info-item">
+                            <label><i class="fas fa-sign-in-alt"></i> Último acceso</label>
+                            <p>{{ user.last_login|date:"d/m/Y H:i"|default:"Nunca" }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <h3><i class="fas fa-shield-alt"></i> Estado de la Cuenta</h3>
+                    <div class="status-grid">
+                        <div class="status-item {% if user.is_active %}status-active{% else %}status-inactive{% endif %}">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Cuenta {{ user.is_active|yesno:"Activa,Inactiva" }}</span>
+                        </div>
+                        <div class="status-item {% if user.email_verificado %}status-active{% else %}status-warning{% endif %}">
+                            <i class="fas fa-envelope-open-text"></i>
+                            <span>Email {{ user.email_verificado|yesno:"Verificado,No Verificado" }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile-actions">
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Editar Perfil
+                    </a>
+                    <a href="#" class="btn btn-secondary">
+                        <i class="fas fa-key"></i> Cambiar Contraseña
+                    </a>
+                    <a href="{% url 'logout' %}" class="btn btn-danger">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tarjeta de actividad reciente -->
+        <div class="activity-card">
+            <h3><i class="fas fa-history"></i> Actividad Reciente</h3>
+            <div class="activity-list">
+                <div class="activity-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <p><strong>Próximas reservas</strong></p>
+                        <small>No tienes reservas pendientes</small>
+                    </div>
+                </div>
+                <div class="activity-item">
+                    <i class="fas fa-history"></i>
+                    <div>
+                        <p><strong>Historial de reservas</strong></p>
+                        <small>Ver todas las reservas anteriores</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
 {% endblock %}

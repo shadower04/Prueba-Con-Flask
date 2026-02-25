@@ -2,6 +2,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path('panel/cancelar-reserva/<int:reserva_id>/', views.cancelar_reserva, name='cancelar_reserva'),
+    path('disponibilidad/json/', views.api_disponibilidad, name='api_disponibilidad'),
     # Páginas principales
     path('', views.index, name='index'),
      # Autenticación

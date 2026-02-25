@@ -20,13 +20,14 @@ from django.contrib.auth import login, authenticate, logout
 from django.views.decorators.http import require_http_methods
 from .forms import RegistroForm, LoginForm
 from .models import Usuario
+from django.utils import timezone
+from datetime import timedelta
 
 @require_http_methods(["GET", "POST"])
 def register_view(request):
     """
     Vista para el registro de nuevos usuarios
     """
-    # Si el usuario ya está autenticado, redirigir al inicio
     if request.user.is_authenticated:
         messages.info(request, 'Ya tienes una sesión iniciada.')
         return redirect('index')
@@ -34,10 +35,7 @@ def register_view(request):
     if request.method == 'POST':
         form = RegistroForm(request.POST)
         if form.is_valid():
-            # Guardar el nuevo usuario
             user = form.save()
-            
-            # Autenticar y hacer login automáticamente
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password1')
             user = authenticate(username=username, password=password)
@@ -47,7 +45,6 @@ def register_view(request):
                 messages.success(request, f'¡Bienvenido {user.get_nombre_completo()}! Tu cuenta ha sido creada exitosamente.')
                 return redirect('index')
         else:
-            # Mostrar errores del formulario
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f'{error}')
@@ -65,7 +62,6 @@ def login_view(request):
     """
     Vista para el login de usuarios
     """
-    # Si el usuario ya está autenticado, redirigir al inicio
     if request.user.is_authenticated:
         messages.info(request, 'Ya tienes una sesión iniciada.')
         return redirect('index')
@@ -77,10 +73,8 @@ def login_view(request):
             password = form.cleaned_data.get('password')
             remember_me = form.cleaned_data.get('remember_me')
             
-            # Intentar autenticar con username
             user = authenticate(username=username, password=password)
             
-            # Si no funciona, intentar con email
             if user is None:
                 try:
                     usuario_obj = Usuario.objects.get(email=username)
@@ -91,17 +85,13 @@ def login_view(request):
             if user is not None:
                 login(request, user)
                 
-                # Configurar duración de la sesión
                 if not remember_me:
-                    # Sesión expira al cerrar el navegador
                     request.session.set_expiry(0)
                 else:
-                    # Sesión expira en 2 semanas
-                    request.session.set_expiry(1209600)  # 2 semanas en segundos
+                    request.session.set_expiry(1209600)
                 
                 messages.success(request, f'¡Bienvenido de vuelta, {user.get_nombre_completo()}!')
                 
-                # Redirigir a la página que intentaba acceder o al inicio
                 next_page = request.GET.get('next', 'index')
                 return redirect(next_page)
             else:
@@ -119,9 +109,6 @@ def login_view(request):
 
 @login_required
 def logout_view(request):
-    """
-    Vista para cerrar sesión
-    """
     nombre_usuario = request.user.get_nombre_completo()
     logout(request)
     messages.success(request, f'¡Hasta pronto, {nombre_usuario}! Has cerrado sesión exitosamente.')
@@ -129,20 +116,13 @@ def logout_view(request):
 
 @login_required
 def perfil_view(request):
-    """
-    Vista del perfil del usuario (opcional)
-    """
     context = {
         'user': request.user,
         'title': 'Mi Perfil'
     }
     return render(request, 'perfil.html', context)
 
-
 def forgot_password_view(request):
-    """
-    Vista para recuperación de contraseña (placeholder)
-    """
     messages.info(request, 'La funcionalidad de recuperación de contraseña estará disponible próximamente.')
     return redirect('login')
 
@@ -150,7 +130,6 @@ def forgot_password_view(request):
 # CONFIGURACIÓN INICIAL
 # ==========================
 
-# Inicializar SDK de MercadoPago
 sdk = mercadopago.SDK(settings.MERCADOPAGO['ACCESS_TOKEN'])
 
 HORARIOS = [
@@ -165,8 +144,34 @@ HORARIOS = [
 # VISTAS DE ADMINISTRACIÓN
 # ==========================
 
+@login_required
+def cancelar_reserva(request, reserva_id):
+    """Endpoint para cancelar una reserva desde el panel admin"""
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Sin permisos"}, status=403)
+
+    if request.method != 'POST':
+        return JsonResponse({"success": False, "message": "Método no permitido"}, status=405)
+
+    try:
+        reserva = Reserva.objects.get(id=reserva_id)
+
+        if reserva.estado == 'cancelada':
+            return JsonResponse({"success": False, "message": "La reserva ya está cancelada"})
+
+        reserva.estado = 'cancelada'
+        reserva.save()
+
+        print(f"✅ Reserva #{reserva_id} cancelada por {request.user.username}")
+        return JsonResponse({"success": True, "message": f"Reserva #{reserva_id} cancelada correctamente"})
+
+    except Reserva.DoesNotExist:
+        return JsonResponse({"success": False, "message": "Reserva no encontrada"}, status=404)
+
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=500)
+
 def admin_login(request):
-    """Login para administradores"""
     if request.method == 'POST':
         usuario = request.POST.get('usuario')
         password = request.POST.get('password')
@@ -199,19 +204,14 @@ def admin_login(request):
 
 @login_required
 def admin_panel(request):
-    """Panel de administración"""
-    # Obtener todas las reservas
     reservas = Reserva.objects.all().order_by('-created_at')
     
-    # Calcular estadísticas
     total_reservas = reservas.count()
     
-    # Ingresos (suma de señas de reservas confirmadas)
     ingresos = reservas.filter(estado='confirmada').aggregate(
         total=Sum('seña')
     )['total'] or 0
     
-    # Tasa de confirmación
     confirmadas = reservas.filter(estado='confirmada').count()
     tasa_confirm = round((confirmadas / total_reservas * 100) if total_reservas > 0 else 0, 1)
     
@@ -225,7 +225,6 @@ def admin_panel(request):
     return render(request, 'admin.html', context)
 
 def admin_logout(request):
-    """Cerrar sesión"""
     logout(request)
     return redirect('index')
 
@@ -233,38 +232,30 @@ def admin_logout(request):
 # FUNCIÓN PARA GENERAR PDF
 # ==========================
 def generar_pdf_reserva(reserva):
-    """Genera un PDF profesional con los detalles de la reserva"""
     buffer = BytesIO()
     p = canvas.Canvas(buffer, pagesize=letter)
     width, height = letter
     
-    # ===== HEADER CON FONDO =====
     p.setFillColorRGB(0.16, 0.32, 0.59)
     p.rect(0, height - 2*inch, width, 2*inch, fill=True, stroke=False)
     
-    # Título principal
     p.setFillColorRGB(1, 1, 1)
     p.setFont("Helvetica-Bold", 32)
     p.drawCentredString(width/2, height - 1*inch, 'Cancha 5 "El Golazo"')
     
-    # Subtítulo
     p.setFont("Helvetica", 16)
     p.drawCentredString(width/2, height - 1.4*inch, '⚽ Comprobante de Reserva ⚽')
     
-    # ===== SECCIÓN DE DATOS DEL CLIENTE =====
     y_pos = height - 2.8*inch
     
-    # Caja de datos del cliente
     p.setFillColorRGB(0.96, 0.96, 0.96)
     p.setStrokeColorRGB(0.16, 0.32, 0.59)
     p.roundRect(1*inch, y_pos - 1.2*inch, width - 2*inch, 1.4*inch, 10, fill=True, stroke=True)
     
-    # Título de sección
     p.setFillColorRGB(0.16, 0.32, 0.59)
     p.setFont("Helvetica-Bold", 14)
     p.drawString(1.2*inch, y_pos - 0.3*inch, '👤 DATOS DEL CLIENTE')
     
-    # Datos del cliente
     p.setFillColorRGB(0, 0, 0)
     p.setFont("Helvetica", 11)
     y_pos -= 0.7*inch
@@ -274,20 +265,16 @@ def generar_pdf_reserva(reserva):
     y_pos -= 0.25*inch
     p.drawString(1.2*inch, y_pos, f'Teléfono: {reserva.telefono}')
     
-    # ===== SECCIÓN DE RESERVA =====
     y_pos -= 0.8*inch
     
-    # Caja de datos de reserva
     p.setFillColorRGB(0.91, 0.96, 0.97)
     p.setStrokeColorRGB(0.16, 0.32, 0.59)
     p.roundRect(1*inch, y_pos - 1.2*inch, width - 2*inch, 1.4*inch, 10, fill=True, stroke=True)
     
-    # Título de sección
     p.setFillColorRGB(0.16, 0.32, 0.59)
     p.setFont("Helvetica-Bold", 14)
     p.drawString(1.2*inch, y_pos - 0.3*inch, '📅 DETALLES DE LA RESERVA')
     
-    # Datos de la reserva
     p.setFillColorRGB(0, 0, 0)
     p.setFont("Helvetica-Bold", 12)
     y_pos -= 0.7*inch
@@ -296,20 +283,16 @@ def generar_pdf_reserva(reserva):
     p.drawString(2.5*inch, y_pos, f'|  Fecha: {reserva.fecha}')
     p.drawString(4.5*inch, y_pos, f'|  Horario: {reserva.hora}')
     
-    # ===== SECCIÓN DE PAGO =====
     y_pos -= 0.8*inch
     
-    # Caja de pago
     p.setFillColorRGB(1, 0.95, 0.9)
     p.setStrokeColorRGB(1, 0.42, 0.21)
     p.roundRect(1*inch, y_pos - 1.4*inch, width - 2*inch, 1.6*inch, 10, fill=True, stroke=True)
     
-    # Título de sección
     p.setFillColorRGB(1, 0.42, 0.21)
     p.setFont("Helvetica-Bold", 14)
     p.drawString(1.2*inch, y_pos - 0.3*inch, '💰 INFORMACIÓN DE PAGO')
     
-    # Detalles de pago
     y_pos -= 0.65*inch
     p.setFillColorRGB(0, 0, 0)
     p.setFont("Helvetica", 11)
@@ -332,7 +315,6 @@ def generar_pdf_reserva(reserva):
     p.setFont("Helvetica-Bold", 12)
     p.drawString(5*inch, y_pos, f'${int(saldo):,}')
     
-    # ===== NOTA IMPORTANTE =====
     y_pos -= 0.8*inch
     p.setFillColorRGB(1, 0.95, 0.8)
     p.setStrokeColorRGB(1, 0.75, 0)
@@ -343,13 +325,11 @@ def generar_pdf_reserva(reserva):
     y_pos -= 0.35*inch
     p.drawString(1.2*inch, y_pos, '⚠️ IMPORTANTE: Recordá abonar el saldo restante el día de la reserva.')
     
-    # ===== PIE DE PÁGINA =====
     p.setFillColorRGB(0.5, 0.5, 0.5)
     p.setFont("Helvetica", 9)
     p.drawCentredString(width/2, 1.2*inch, '📍 Av. del Fútbol 1234')
     p.drawCentredString(width/2, 1*inch, '📞 (011) 1234-5678  |  ✉️ info@elgolazo.com')
     
-    # Línea decorativa
     p.setStrokeColorRGB(0.16, 0.32, 0.59)
     p.line(1.5*inch, 0.8*inch, width - 1.5*inch, 0.8*inch)
     
@@ -366,12 +346,9 @@ def generar_pdf_reserva(reserva):
 # FUNCIÓN PARA ENVIAR EMAIL
 # ==========================
 def enviar_email_confirmacion(reserva):
-    """Envía email con PDF de confirmación"""
     try:
-        # Generar PDF
         pdf_buffer = generar_pdf_reserva(reserva)
         
-        # Crear email
         subject = f'Confirmación de Reserva - Cancha {reserva.cancha}'
         message = f"""
 Hola {reserva.nombre}!
@@ -401,7 +378,6 @@ Cancha 5 "El Golazo"
             to=[reserva.email],
         )
         
-        # Adjuntar PDF
         email.attach(
             f'Reserva_Cancha_{reserva.cancha}_{reserva.fecha}.pdf',
             pdf_buffer.getvalue(),
@@ -421,7 +397,6 @@ Cancha 5 "El Golazo"
 # ==========================
 
 def index(request):
-    """Página principal"""
     CANCHAS_DISPONIBLES = [
         {'id': 1, 'nombre': 'Cancha 1'},
         {'id': 2, 'nombre': 'Cancha 2'}, 
@@ -432,32 +407,44 @@ def index(request):
     })
 
 def contacto(request):
-    """Página de contacto"""
     return render(request, "contacto.html")
 
 def disponibilidad(request):
-    """Página de disponibilidad"""
     return render(request, "disponibilidad.html", {
         "fecha_hoy": date.today().isoformat()
     })
 
 def reservas(request):
-    """Muestra todas las reservas"""
     reservas_lista = Reserva.objects.all().order_by('-created_at')
     return render(request, "reservas.html", {"reservas": reservas_lista})
 
 # ==========================
-# API DISPONIBILIDAD
+# API DISPONIBILIDAD  ← ✅ CORREGIDA
 # ==========================
 def api_disponibilidad(request):
-    """API para consultar disponibilidad"""
+    """API para consultar disponibilidad.
+    
+    Considera OCUPADO cuando:
+    - estado = 'confirmada'  (pago aprobado)
+    - estado = 'pendiente'   Y  creada hace menos de 30 minutos (pago en proceso)
+    
+    Las pendientes viejas (+30 min) se ignoran: el usuario abandonó el pago.
+    """
     try:
         fecha = request.GET.get("fecha")
         if not fecha:
             return JsonResponse({"success": False, "error": "Fecha no especificada"})
-        
-        # Solo mostrar reservas confirmadas como ocupadas
-        reservas_ocupadas = Reserva.objects.filter(fecha=fecha, estado='confirmada')
+
+        limite_pendiente = timezone.now() - timedelta(minutes=30)
+
+        reservas_ocupadas = Reserva.objects.filter(
+            fecha=fecha,
+            estado__in=['confirmada', 'pendiente']
+        ).exclude(
+            # Excluir pendientes que llevan más de 30 min sin pagar
+            estado='pendiente',
+            created_at__lt=limite_pendiente
+        )
         
         ocupadas = {}
         for r in reservas_ocupadas:
@@ -475,25 +462,22 @@ def api_disponibilidad(request):
         return JsonResponse({"success": False, "error": str(e)})
 
 # ==========================
-# RESERVA CON MERCADOPAGO (VERSIÓN ÚNICA Y CORREGIDA)
+# RESERVA CON MERCADOPAGO
 # ==========================
 @csrf_exempt
 def reservar(request):
-    """Crea una nueva reserva con MercadoPago - VERSIÓN DEBUG"""
-    if request.method != "POST":
-        return JsonResponse({"success": False, "message": "Método no permitido"})
+    if request.method == "GET":
+        return render(request, "reservas.html")
 
     try:
         print("\n" + "="*80)
         print("🚀 INICIANDO PROCESO DE RESERVA - DEBUG MODE")
         print("="*80)
         
-        # Leer datos JSON
         data = json.loads(request.body)
         print(f"📦 1. Datos recibidos del frontend:")
         print(f"   {data}")
         
-        # Extraer datos
         hora = str(data.get("hora", "")).strip()
         cancha_raw = data.get("cancha")
         fecha = str(data.get("fecha", "")).strip()
@@ -501,7 +485,6 @@ def reservar(request):
         email = str(data.get("email", "")).strip()
         telefono = str(data.get("telefono", "")).strip()
         
-        # Convertir cancha
         try:
             cancha = int(cancha_raw)
         except (ValueError, TypeError):
@@ -512,14 +495,9 @@ def reservar(request):
             })
         
         print(f"✅ 2. Datos procesados:")
-        print(f"   Hora: {hora}")
-        print(f"   Cancha: {cancha} (tipo: {type(cancha)})")
-        print(f"   Fecha: {fecha}")
-        print(f"   Nombre: {nombre}")
-        print(f"   Email: {email}")
-        print(f"   Teléfono: {telefono}")
+        print(f"   Hora: {hora} | Cancha: {cancha} | Fecha: {fecha}")
+        print(f"   Nombre: {nombre} | Email: {email} | Teléfono: {telefono}")
         
-        # Validación
         if not all([hora, fecha, nombre, email, telefono]):
             print("❌ Campos faltantes")
             return JsonResponse({
@@ -527,9 +505,16 @@ def reservar(request):
                 "message": "Todos los campos son obligatorios"
             })
         
-        # Verificar disponibilidad
+        # ✅ VERIFICAR DISPONIBILIDAD — bloquea confirmadas Y pendientes recientes
+        limite_pendiente = timezone.now() - timedelta(minutes=30)
         existe = Reserva.objects.filter(
-            fecha=fecha, hora=hora, cancha=cancha, estado='confirmada'
+            fecha=fecha,
+            hora=hora,
+            cancha=cancha,
+            estado__in=['confirmada', 'pendiente']
+        ).exclude(
+            estado='pendiente',
+            created_at__lt=limite_pendiente
         ).exists()
         
         if existe:
@@ -541,16 +526,12 @@ def reservar(request):
         
         print("✅ 3. Disponibilidad verificada")
         
-        # ===== CALCULAR PRECIOS =====
         precios_cancha = {1: 20000.00, 2: 60000.00, 3: 80000.00}
         precio_total = precios_cancha.get(cancha, 20000.00)
         seña = round(precio_total * 0.15, 2)
         
-        print(f"💰 4. Precios calculados:")
-        print(f"   Precio total: ${precio_total:,.2f}")
-        print(f"   Seña (15%): ${seña:,.2f}")
+        print(f"💰 4. Precio total: ${precio_total:,.2f} | Seña (15%): ${seña:,.2f}")
         
-        # ===== CREAR RESERVA =====
         try:
             reserva = Reserva.objects.create(
                 fecha=fecha, hora=hora, cancha=cancha,
@@ -566,21 +547,17 @@ def reservar(request):
                 "message": f"Error al crear reserva: {str(db_error)}"
             })
         
-        # ===== CONECTAR CON MERCADOPAGO =====
         print("🔄 6. Conectando con MercadoPago...")
         
-        # Verificar token
         mp_token = settings.MERCADOPAGO.get('ACCESS_TOKEN', '')
         print(f"   Token MP: {mp_token[:30]}...")
         
         if not mp_token:
-            print("❌ ERROR: No hay token de MercadoPago configurado")
             return JsonResponse({
                 "success": False, 
                 "message": "Error de configuración del sistema de pagos"
             })
         
-        # Crear datos de la preferencia
         preference_data = {
             "items": [
                 {
@@ -597,12 +574,12 @@ def reservar(request):
                 "surname": "",
                 "email": email,
                 "phone": {
-                    "area_code": "11",  # Buenos Aires
+                    "area_code": "11",
                     "number": telefono[-8:] if len(telefono) > 8 else telefono
                 },
                 "identification": {
                     "type": "DNI",
-                    "number": "12345678"  # Puedes pedir esto o usar un valor por defecto
+                    "number": "12345678"
                 }
             },
             "back_urls": {
@@ -613,28 +590,15 @@ def reservar(request):
             "external_reference": str(reserva.id),
         }
         
-        print(f"📤 7. Enviando a MercadoPago:")
-        print(f"   Datos: {json.dumps(preference_data, indent=2, ensure_ascii=False)}")
+        print(f"📤 7. Enviando a MercadoPago...")
         
         try:
-            # Intentar crear la preferencia
             preference_response = sdk.preference().create(preference_data)
             print(f"📥 8. Respuesta de MercadoPago recibida")
-            
-            # DEBUG: Mostrar respuesta completa
             print(f"   Respuesta completa: {json.dumps(preference_response, indent=2, ensure_ascii=False)}")
             
             if "response" not in preference_response:
-                print("❌ ERROR: MercadoPago no devolvió 'response'")
-                print(f"   Respuesta: {preference_response}")
-                
-                # Intentar obtener más detalles del error
-                if "error" in preference_response:
-                    print(f"   Error MP: {preference_response['error']}")
-                    error_msg = preference_response['error'].get('message', 'Error desconocido')
-                else:
-                    error_msg = "MercadoPago no respondió correctamente"
-                
+                error_msg = preference_response.get('error', {}).get('message', 'MercadoPago no respondió correctamente')
                 return JsonResponse({
                     "success": False, 
                     "message": f"❌ Error MercadoPago: {error_msg}"
@@ -644,15 +608,9 @@ def reservar(request):
             print(f"✅ 9. Preferencia creada - ID: {preference.get('id')}")
             
             if "init_point" not in preference:
-                print("❌ ERROR: No hay 'init_point' en la respuesta")
-                print(f"   Campos disponibles: {list(preference.keys())}")
-                
-                # Buscar link de pago en otros campos
                 if "sandbox_init_point" in preference:
-                    print(f"   ✅ Encontrado sandbox_init_point")
                     init_point = preference["sandbox_init_point"]
                 else:
-                    print(f"   Respuesta completa: {preference}")
                     return JsonResponse({
                         "success": False, 
                         "message": "MercadoPago no generó link de pago"
@@ -660,10 +618,8 @@ def reservar(request):
             else:
                 init_point = preference["init_point"]
             
-            print(f"🔗 10. Link de pago generado:")
-            print(f"   {init_point}")
+            print(f"🔗 10. Link de pago: {init_point}")
             
-            # Guardar ID de preferencia
             reserva.preference_id = preference.get("id")
             reserva.save()
             
@@ -682,13 +638,9 @@ def reservar(request):
             
         except Exception as mp_error:
             print(f"❌ ERROR con MercadoPago: {str(mp_error)}")
-            import traceback
             traceback.print_exc()
-            
-            # Marcar reserva como fallida
             reserva.estado = 'error_mp'
             reserva.save()
-            
             return JsonResponse({
                 "success": False, 
                 "message": f"Error al conectar con MercadoPago: {str(mp_error)}"
@@ -702,18 +654,17 @@ def reservar(request):
         
     except Exception as e:
         print(f"❌ ERROR GENERAL: {str(e)}")
-        import traceback
         traceback.print_exc()
         return JsonResponse({
             "success": False, 
             "message": f"Error del sistema: {str(e)}"
         })
+
 # ==========================
 # WEBHOOK MERCADOPAGO
 # ==========================
 @csrf_exempt
 def webhook_mercadopago(request):
-    """Webhook para recibir notificaciones de MercadoPago"""
     if request.method == "POST":
         try:
             data = json.loads(request.body)
@@ -722,11 +673,9 @@ def webhook_mercadopago(request):
             if data.get("type") == "payment":
                 payment_id = data["data"]["id"]
                 
-                # Obtener info del pago
                 payment_info = sdk.payment().get(payment_id)
                 payment = payment_info["response"]
                 
-                # Buscar reserva por external_reference
                 reserva_id = payment.get("external_reference")
                 if reserva_id:
                     reserva = Reserva.objects.get(id=reserva_id)
@@ -735,8 +684,6 @@ def webhook_mercadopago(request):
                         reserva.estado = 'confirmada'
                         reserva.payment_id = str(payment_id)
                         reserva.save()
-                        
-                        # Enviar email con PDF
                         enviar_email_confirmacion(reserva)
                         print(f"✅ Reserva {reserva_id} confirmada vía webhook")
                 
@@ -752,7 +699,6 @@ def webhook_mercadopago(request):
 # VISTAS DE PAGO
 # ==========================
 def pago_exitoso(request):
-    """Página de confirmación de pago exitoso"""
     try:
         payment_id = request.GET.get('payment_id')
         external_reference = request.GET.get('external_reference')
@@ -763,14 +709,11 @@ def pago_exitoso(request):
             try:
                 reserva = Reserva.objects.get(id=external_reference)
                 
-                # Solo actualizar si está pendiente
                 if reserva.estado == 'pendiente':
                     reserva.estado = 'confirmada'
                     if payment_id:
                         reserva.payment_id = payment_id
                     reserva.save()
-                    
-                    # Enviar email
                     enviar_email_confirmacion(reserva)
                     print(f"✅ Reserva {reserva.id} confirmada desde pago_exitoso")
                 
@@ -796,7 +739,6 @@ def pago_exitoso(request):
         })
 
 def pago_fallido(request):
-    """Página de pago fallido"""
     external_reference = request.GET.get('external_reference')
     
     if external_reference:
@@ -809,7 +751,6 @@ def pago_fallido(request):
     return render(request, 'pago_fallido.html')
 
 def pago_pendiente(request):
-    """Página de pago pendiente"""
     external_reference = request.GET.get('external_reference')
     
     if external_reference:
@@ -825,7 +766,6 @@ def pago_pendiente(request):
 # VISTAS DE PRUEBA
 # ==========================
 def test_pdf(request, reserva_id):
-    """Descargar PDF de prueba"""
     try:
         reserva = Reserva.objects.get(id=reserva_id)
         pdf_buffer = generar_pdf_reserva(reserva)
@@ -837,7 +777,6 @@ def test_pdf(request, reserva_id):
         return HttpResponse(f"Error: {str(e)}")
 
 def test_enviar_email(request, reserva_id):
-    """Vista temporal para probar el envío de email"""
     try:
         reserva = Reserva.objects.get(id=reserva_id)
         reserva.estado = 'confirmada'
@@ -868,13 +807,11 @@ def test_enviar_email(request, reserva_id):
 # ==========================
 @csrf_exempt
 def reservar_emergencia(request):
-    """Versión simplificada para debug"""
     if request.method == "POST":
         try:
             data = json.loads(request.body)
             print("🆘 RESERVA EMERGENCIA - Datos:", data)
             
-            # Crear reserva mínima
             reserva = Reserva()
             reserva.fecha = data.get("fecha", "2024-01-01")
             reserva.hora = data.get("hora", "14:00-15:00")
@@ -889,7 +826,6 @@ def reservar_emergencia(request):
             
             print(f"✅ RESERVA EMERGENCIA CREADA - ID: {reserva.id}")
             
-            # Pago simple en MP
             preference_data = {
                 "items": [{
                     "title": "Seña Cancha 1",

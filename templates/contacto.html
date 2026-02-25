@@ -2,6 +2,298 @@
 
 {% block title %}Contacto - El Golazo{% endblock %}
 
+{% block extra_styles %}
+<style>
+    /* ====== CONTACTO PAGE STYLES ====== */
+    .contacto-section {
+        padding: 60px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 400px);
+    }
+
+    .contacto-container {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Columna de Información */
+    .info-column { display: flex; flex-direction: column; gap: 30px; }
+
+    .info-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .info-header {
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+        padding: 25px;
+    }
+
+    .info-header h2 {
+        color: white;
+        font-size: 1.5rem;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .info-content { padding: 30px; }
+
+    .info-item {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 30px;
+        padding-bottom: 30px;
+        border-bottom: 2px solid #f0f0f0;
+    }
+
+    .info-item:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+    .info-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #ff6b35, #ff8533);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+
+    .info-icon i { color: white; font-size: 1.3rem; }
+
+    .info-text h3 { color: #2a5298; font-size: 1.2rem; margin: 0 0 10px 0; font-weight: 700; }
+    .info-text p  { color: #333; margin: 0; line-height: 1.6; }
+    .info-text p strong { color: #2a5298; font-weight: 600; }
+
+    .email-address {
+        font-family: 'Courier New', monospace;
+        background: #f8f9fa;
+        padding: 8px 12px;
+        border-radius: 8px;
+        display: inline-block;
+        margin: 5px 0;
+        color: #ff6b35;
+        font-weight: 600;
+        border: 1px solid #e0e0e0;
+    }
+
+    /* Redes Sociales */
+    .redes-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        text-align: center;
+    }
+
+    .redes-card h3 {
+        color: #2a5298;
+        font-size: 1.3rem;
+        margin: 0 0 20px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .redes-card h3 i { color: #ff6b35; }
+
+    .redes-icons { display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; }
+
+    .red-social {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.3rem;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .red-social:hover { transform: translateY(-5px) scale(1.1); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+    .red-social.facebook  { background: #3b5998; }
+    .red-social.instagram { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+    .red-social.whatsapp  { background: #25d366; }
+    .red-social.twitter   { background: #1da1f2; }
+
+    /* Columna de Formulario */
+    .form-column { width: 100%; }
+
+    .form-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .form-header {
+        background: linear-gradient(135deg, #ff6b35, #ff8533);
+        padding: 30px;
+        text-align: center;
+    }
+
+    .form-header h2 {
+        color: white;
+        font-size: 1.8rem;
+        margin: 0 0 10px 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .form-header p { color: white; margin: 0; opacity: 0.95; font-size: 1.05rem; }
+
+    .form-card form { padding: 40px; }
+
+    .form-group { margin-bottom: 25px; }
+
+    .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #2a5298;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+    }
+
+    .form-group label i { color: #ff6b35; width: 20px; text-align: center; }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        color: #333;
+        font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: #ff6b35;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+    }
+
+    .form-group textarea { resize: vertical; min-height: 120px; }
+
+    /* Botón Enviar */
+    .form-actions { margin-top: 30px; text-align: center; }
+
+    .btn-enviar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+        color: white;
+        padding: 18px 45px;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 1.3rem;
+        transition: all 0.4s ease;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(42, 82, 152, 0.4);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        min-width: 280px;
+    }
+
+    .btn-enviar:hover {
+        background: linear-gradient(135deg, #1e3c72, #2a5298);
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(42, 82, 152, 0.6);
+    }
+
+    .btn-enviar:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .contacto-container { grid-template-columns: 1fr; gap: 30px; }
+        .info-column  { order: 2; }
+        .form-column  { order: 1; }
+    }
+
+    @media (max-width: 768px) {
+        .contacto-section    { padding: 40px 0; }
+        .info-content        { padding: 20px; }
+        .form-card form      { padding: 30px 20px; }
+        .btn-enviar          { width: 100%; font-size: 1.1rem; }
+    }
+
+    /* ====== DARK MODE — CONTACTO ====== */
+    body.dark-mode .contacto-section {
+        background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+    }
+
+    body.dark-mode .info-card,
+    body.dark-mode .redes-card,
+    body.dark-mode .form-card {
+        background: #1e1e1e;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode .info-item  { border-color: #2a2a2a; }
+
+    body.dark-mode .info-text h3   { color: #90b4f5; }
+    body.dark-mode .info-text p    { color: #cccccc; }
+    body.dark-mode .info-text p strong { color: #90b4f5; }
+
+    body.dark-mode .email-address {
+        background: #2a2a2a;
+        border-color: #444;
+        color: #ff8c5a;
+    }
+
+    body.dark-mode .redes-card h3  { color: #90b4f5; }
+
+    body.dark-mode .form-group label { color: #90b4f5; }
+
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group select,
+    body.dark-mode .form-group textarea {
+        background: #2a2a2a !important;
+        color: #e0e0e0 !important;
+        border-color: #444 !important;
+    }
+
+    body.dark-mode .form-group input:focus,
+    body.dark-mode .form-group select:focus,
+    body.dark-mode .form-group textarea:focus {
+        background: #333 !important;
+        border-color: #ff6b35 !important;
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2) !important;
+    }
+
+    body.dark-mode .form-group input::placeholder,
+    body.dark-mode .form-group textarea::placeholder { color: #666 !important; }
+
+    body.dark-mode .form-group select option {
+        background: #2a2a2a;
+        color: #e0e0e0;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <!-- Page Header -->
 <section class="page-header">
@@ -15,50 +307,43 @@
 <section class="contacto-section">
     <div class="container">
         <div class="contacto-container">
+
             <!-- Información de Contacto -->
             <div class="info-column">
                 <div class="info-card">
                     <div class="info-header">
                         <h2><i class="fas fa-info-circle"></i> Nuestra Información</h2>
                     </div>
-                    
+
                     <div class="info-content">
                         <div class="info-item">
-                            <div class="info-icon">
-                                <i class="fas fa-map-marker-alt"></i>
-                            </div>
+                            <div class="info-icon"><i class="fas fa-map-marker-alt"></i></div>
                             <div class="info-text">
                                 <h3>Dirección</h3>
                                 <p>Av. del Fútbol 1234<br>Buenos Aires, Argentina</p>
                             </div>
                         </div>
-                        
+
                         <div class="info-item">
-                            <div class="info-icon">
-                                <i class="fas fa-phone-alt"></i>
-                            </div>
+                            <div class="info-icon"><i class="fas fa-phone-alt"></i></div>
                             <div class="info-text">
                                 <h3>Teléfonos</h3>
                                 <p><strong>Reservas:</strong> (011) 1234-5678<br>
                                 <strong>Administración:</strong> (011) 9876-5432</p>
                             </div>
                         </div>
-                        
+
                         <div class="info-item">
-                            <div class="info-icon">
-                                <i class="fas fa-envelope"></i>
-                            </div>
+                            <div class="info-icon"><i class="fas fa-envelope"></i></div>
                             <div class="info-text">
                                 <h3>Email</h3>
                                 <p class="email-address">reservas@elgolazo.com</p>
                                 <p class="email-address">info@elgolazo.com</p>
                             </div>
                         </div>
-                        
+
                         <div class="info-item">
-                            <div class="info-icon">
-                                <i class="fas fa-clock"></i>
-                            </div>
+                            <div class="info-icon"><i class="fas fa-clock"></i></div>
                             <div class="info-text">
                                 <h3>Horarios</h3>
                                 <p><strong>Lunes a Viernes:</strong> 8:00 - 24:00<br>
@@ -67,27 +352,19 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Redes Sociales -->
                 <div class="redes-card">
                     <h3><i class="fas fa-share-alt"></i> Seguinos en Redes</h3>
                     <div class="redes-icons">
-                        <a href="#" class="red-social facebook">
-                            <i class="fab fa-facebook-f"></i>
-                        </a>
-                        <a href="#" class="red-social instagram">
-                            <i class="fab fa-instagram"></i>
-                        </a>
-                        <a href="#" class="red-social whatsapp">
-                            <i class="fab fa-whatsapp"></i>
-                        </a>
-                        <a href="#" class="red-social twitter">
-                            <i class="fab fa-twitter"></i>
-                        </a>
+                        <a href="#" class="red-social facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="red-social instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="red-social whatsapp"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#" class="red-social twitter"><i class="fab fa-twitter"></i></a>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Formulario de Contacto -->
             <div class="form-column">
                 <div class="form-card">
@@ -95,36 +372,28 @@
                         <h2><i class="fas fa-paper-plane"></i> Envíanos un Mensaje</h2>
                         <p>Completá el formulario y te responderemos a la brevedad</p>
                     </div>
-                    
+
                     <form id="contactForm">
                         <div class="form-group">
-                            <label for="nombre">
-                                <i class="fas fa-user"></i> Nombre Completo *
-                            </label>
-                            <input type="text" id="nombre" name="nombre" required 
+                            <label for="nombre"><i class="fas fa-user"></i> Nombre Completo *</label>
+                            <input type="text" id="nombre" name="nombre" required
                                    placeholder="Ingresá tu nombre completo">
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="email">
-                                <i class="fas fa-envelope"></i> Email *
-                            </label>
-                            <input type="email" id="email" name="email" required 
+                            <label for="email"><i class="fas fa-envelope"></i> Email *</label>
+                            <input type="email" id="email" name="email" required
                                    placeholder="tucorreo@ejemplo.com">
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="telefono">
-                                <i class="fas fa-phone"></i> Teléfono *
-                            </label>
-                            <input type="tel" id="telefono" name="telefono" required 
+                            <label for="telefono"><i class="fas fa-phone"></i> Teléfono *</label>
+                            <input type="tel" id="telefono" name="telefono" required
                                    placeholder="1123456789">
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="asunto">
-                                <i class="fas fa-tag"></i> Asunto *
-                            </label>
+                            <label for="asunto"><i class="fas fa-tag"></i> Asunto *</label>
                             <select id="asunto" name="asunto" required>
                                 <option value="">Seleccionar asunto</option>
                                 <option value="reserva">Reserva</option>
@@ -133,15 +402,13 @@
                                 <option value="sugerencia">Sugerencia</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="mensaje">
-                                <i class="fas fa-comment-alt"></i> Mensaje *
-                            </label>
-                            <textarea id="mensaje" name="mensaje" rows="5" required 
+                            <label for="mensaje"><i class="fas fa-comment-alt"></i> Mensaje *</label>
+                            <textarea id="mensaje" name="mensaje" rows="5" required
                                       placeholder="Escribí tu mensaje aquí..."></textarea>
                         </div>
-                        
+
                         <div class="form-actions">
                             <button type="submit" class="btn-enviar">
                                 <i class="fas fa-paper-plane"></i>
@@ -151,368 +418,36 @@
                     </form>
                 </div>
             </div>
+
         </div>
     </div>
 </section>
+{% endblock %}
 
-<style>
-    /* ====== CONTACTO PAGE STYLES ====== */
-    .contacto-section {
-        padding: 60px 0;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-        min-height: calc(100vh - 400px);
-    }
-    
-    .contacto-container {
-        display: grid;
-        grid-template-columns: 400px 1fr;
-        gap: 40px;
-        max-width: 1200px;
-        margin: 0 auto;
-    }
-    
-    /* Columna de Información */
-    .info-column {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-    }
-    
-    .info-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-    
-    .info-header {
-        background: linear-gradient(135deg, #2a5298, #1e3c72);
-        padding: 25px;
-    }
-    
-    .info-header h2 {
-        color: white;
-        font-size: 1.5rem;
-        margin: 0;
-        display: flex;
-        align-items: center;
-        gap: 15px;
-    }
-    
-    .info-content {
-        padding: 30px;
-    }
-    
-    .info-item {
-        display: flex;
-        gap: 20px;
-        margin-bottom: 30px;
-        padding-bottom: 30px;
-        border-bottom: 2px solid #f0f0f0;
-    }
-    
-    .info-item:last-child {
-        margin-bottom: 0;
-        padding-bottom: 0;
-        border-bottom: none;
-    }
-    
-    .info-icon {
-        width: 50px;
-        height: 50px;
-        background: linear-gradient(135deg, #ff6b35, #ff8533);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        flex-shrink: 0;
-    }
-    
-    .info-icon i {
-        color: white;
-        font-size: 1.3rem;
-    }
-    
-    .info-text h3 {
-        color: #2a5298;
-        font-size: 1.2rem;
-        margin: 0 0 10px 0;
-        font-weight: 700;
-    }
-    
-    .info-text p {
-        color: #333;
-        margin: 0;
-        line-height: 1.6;
-    }
-    
-    .info-text p strong {
-        color: #2a5298;
-        font-weight: 600;
-    }
-    
-    .email-address {
-        font-family: 'Courier New', monospace;
-        background: #f8f9fa;
-        padding: 8px 12px;
-        border-radius: 8px;
-        display: inline-block;
-        margin: 5px 0;
-        color: #ff6b35 !important;
-        font-weight: 600;
-        border: 1px solid #e0e0e0;
-    }
-    
-    /* Redes Sociales */
-    .redes-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        padding: 30px;
-        text-align: center;
-    }
-    
-    .redes-card h3 {
-        color: #2a5298;
-        font-size: 1.3rem;
-        margin: 0 0 20px 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-    }
-    
-    .redes-card h3 i {
-        color: #ff6b35;
-    }
-    
-    .redes-icons {
-        display: flex;
-        justify-content: center;
-        gap: 15px;
-        flex-wrap: wrap;
-    }
-    
-    .red-social {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-size: 1.3rem;
-        transition: all 0.3s ease;
-        text-decoration: none;
-    }
-    
-    .red-social:hover {
-        transform: translateY(-5px) scale(1.1);
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    }
-    
-    .red-social.facebook {
-        background: #3b5998;
-    }
-    
-    .red-social.instagram {
-        background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
-    }
-    
-    .red-social.whatsapp {
-        background: #25d366;
-    }
-    
-    .red-social.twitter {
-        background: #1da1f2;
-    }
-    
-    /* Columna de Formulario */
-    .form-column {
-        width: 100%;
-    }
-    
-    .form-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-    }
-    
-    .form-header {
-        background: linear-gradient(135deg, #ff6b35, #ff8533);
-        padding: 30px;
-        text-align: center;
-    }
-    
-    .form-header h2 {
-        color: white;
-        font-size: 1.8rem;
-        margin: 0 0 10px 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-    }
-    
-    .form-header p {
-        color: white;
-        margin: 0;
-        opacity: 0.95;
-        font-size: 1.05rem;
-    }
-    
-    .form-card form {
-        padding: 40px;
-    }
-    
-    .form-group {
-        margin-bottom: 25px;
-    }
-    
-    .form-group label {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        color: #2a5298;
-        font-weight: 600;
-        margin-bottom: 10px;
-        font-size: 1.05rem;
-    }
-    
-    .form-group label i {
-        color: #ff6b35;
-        width: 20px;
-        text-align: center;
-    }
-    
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        width: 100%;
-        padding: 16px 20px;
-        border: 2px solid #e0e0e0;
-        border-radius: 12px;
-        font-size: 1rem;
-        transition: all 0.3s ease;
-        background: #f8f9fa;
-        font-family: Arial, Helvetica, sans-serif;
-    }
-    
-    .form-group input:focus,
-    .form-group select:focus,
-    .form-group textarea:focus {
-        outline: none;
-        border-color: #ff6b35;
-        background: white;
-        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
-    }
-    
-    .form-group textarea {
-        resize: vertical;
-        min-height: 120px;
-    }
-    
-    /* Botón Enviar */
-    .form-actions {
-        margin-top: 30px;
-        text-align: center;
-    }
-    
-    .btn-enviar {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 15px;
-        background: linear-gradient(135deg, #2a5298, #1e3c72);
-        color: white;
-        padding: 18px 45px;
-        border-radius: 60px;
-        font-weight: 700;
-        font-size: 1.3rem;
-        transition: all 0.4s ease;
-        border: none;
-        cursor: pointer;
-        box-shadow: 0 10px 30px rgba(42, 82, 152, 0.4);
-        text-transform: uppercase;
-        letter-spacing: 1px;
-        border: 3px solid rgba(255, 255, 255, 0.3);
-        min-width: 280px;
-    }
-    
-    .btn-enviar:hover {
-        background: linear-gradient(135deg, #1e3c72, #2a5298);
-        transform: translateY(-5px) scale(1.05);
-        box-shadow: 0 20px 40px rgba(42, 82, 152, 0.6);
-    }
-    
-    .btn-enviar:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
-    /* Responsive */
-    @media (max-width: 992px) {
-        .contacto-container {
-            grid-template-columns: 1fr;
-            gap: 30px;
-        }
-        
-        .info-column {
-            order: 2;
-        }
-        
-        .form-column {
-            order: 1;
-        }
-    }
-    
-    @media (max-width: 768px) {
-        .contacto-section {
-            padding: 40px 0;
-        }
-        
-        .info-content {
-            padding: 20px;
-        }
-        
-        .form-card form {
-            padding: 30px 20px;
-        }
-        
-        .btn-enviar {
-            width: 100%;
-            font-size: 1.1rem;
-        }
-    }
-</style>
-
+{% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         const form = document.getElementById('contactForm');
-        
-        form.addEventListener('submit', function(e) {
+
+        form.addEventListener('submit', function (e) {
             e.preventDefault();
-            
-            const nombre = document.getElementById('nombre').value.trim();
-            const email = document.getElementById('email').value.trim();
+
+            const nombre   = document.getElementById('nombre').value.trim();
+            const email    = document.getElementById('email').value.trim();
             const telefono = document.getElementById('telefono').value.trim();
-            const asunto = document.getElementById('asunto').value;
-            const mensaje = document.getElementById('mensaje').value.trim();
-            
+            const asunto   = document.getElementById('asunto').value;
+            const mensaje  = document.getElementById('mensaje').value.trim();
+
             if (!nombre || !email || !telefono || !asunto || !mensaje) {
                 alert('❌ Por favor completá todos los campos obligatorios');
                 return;
             }
-            
+
             const submitBtn = form.querySelector('.btn-enviar');
             submitBtn.disabled = true;
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>ENVIANDO...</span>';
-            
-            // Aquí va la lógica para enviar el formulario
+
             // TODO: Implementar envío al backend
-            
             setTimeout(() => {
                 alert('✅ ¡Mensaje enviado correctamente! Te contactaremos pronto.');
                 form.reset();
