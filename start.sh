@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-gunicorn tunombredeproyecto.wsgi:application
+gunicorn gestor.wsgi:application
