@@ -1,62 +1,211 @@
+/* ===== ESTILOS GENERALES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+}
+
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f3f3f3;
-  margin: 0;
-  padding: 0;
+    background: linear-gradient(135deg, #1a2980, #26d0ce);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
 }
 
-header {
-  background-color: #0b6623;
-  color: white;
-  text-align: center;
-  padding: 10px 0;
+/* ===== CONTENEDOR PRINCIPAL ===== */
+.reserva-container {
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    width: 100%;
+    max-width: 900px;
+    overflow: hidden;
 }
 
-nav a {
-  color: white;
-  margin: 0 10px;
-  text-decoration: none;
-  font-weight: bold;
+/* ===== ENCABEZADO ===== */
+.reserva-header {
+    background: linear-gradient(to right, #2c3e50, #3498db);
+    color: white;
+    padding: 30px;
+    text-align: center;
 }
 
-main {
-  padding: 20px;
+.reserva-header h1 {
+    font-size: 2.8rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-form.formulario {
-  display: flex;
-  flex-direction: column;
-  max-width: 400px;
-  margin: auto;
+.reserva-header h2 {
+    font-size: 1.5rem;
+    font-weight: 300;
+    opacity: 0.9;
 }
 
-form input, form select, button {
-  margin: 5px 0;
-  padding: 8px;
+/* ===== FORMULARIO ===== */
+.reserva-form {
+    padding: 40px;
 }
 
-button {
-  background-color: #0b6623;
-  color: white;
-  border: none;
-  cursor: pointer;
+/* Secciones del formulario */
+.form-section {
+    margin-bottom: 40px;
+    padding-bottom: 25px;
+    border-bottom: 2px dashed #ecf0f1;
 }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
+.form-section:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
 }
 
-th, td {
-  border: 1px solid #ccc;
-  padding: 8px;
-  text-align: center;
+.section-title {
+    color: #2c3e50;
+    font-size: 1.8rem;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-.foto-cancha {
-  display: block;
-  margin: 20px auto;
-  max-width: 90%;
-  border-radius: 8px;
+.section-title i {
+    color: #3498db;
+    font-size: 1.5rem;
+}
+
+/* ===== GRUPOS DE FORMULARIO ===== */
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #34495e;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.input-group {
+    position: relative;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #7f8c8d;
+    font-size: 1.2rem;
+}
+
+input, select {
+    width: 100%;
+    padding: 15px 15px 15px 45px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1.1rem;
+    transition: all 0.3s;
+    background-color: #f8f9fa;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #3498db;
+    background-color: white;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+/* ===== BOTÓN ===== */
+.btn-reservar {
+    background: linear-gradient(to right, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    padding: 18px 40px;
+    font-size: 1.3rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: block;
+    width: 100%;
+    font-weight: bold;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+}
+
+.btn-reservar:hover {
+    background: linear-gradient(to right, #c0392b, #a93226);
+    transform: translateY(-3px);
+    box-shadow: 0 7px 15px rgba(231, 76, 60, 0.4);
+}
+
+.btn-reservar:active {
+    transform: translateY(-1px);
+}
+
+/* ===== DETALLES DE LA RESERVA ===== */
+.reserva-details {
+    background-color: #f8f9fa;
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    border-left: 5px solid #3498db;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+    font-weight: bold;
+    color: #e74c3c;
+    font-size: 1.2rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .reserva-form {
+        padding: 20px;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .reserva-header h1 {
+        font-size: 2rem;
+    }
+    
+    .section-title {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 10px;
+    }
+    
+    .reserva-header {
+        padding: 20px;
+    }
+    
+    input, select {
+        padding: 12px 12px 12px 40px;
+    }
 }

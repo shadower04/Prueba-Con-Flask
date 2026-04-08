@@ -1,0 +1,610 @@
+{% extends "base.html" %}
+
+{% block title %}Reservar Cancha - El Golazo{% endblock %}
+
+{% block extra_styles %}
+<style>
+    /* ====== RESERVATION PAGE STYLES ====== */
+    .reservation-section {
+        padding: 60px 0;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        min-height: calc(100vh - 400px);
+    }
+
+    .reservation-container {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 40px;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    /* Form Column */
+    .form-column {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .form-section {
+        padding: 40px;
+    }
+
+    .form-section h2 {
+        color: #2a5298;
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+        padding-bottom: 15px;
+        border-bottom: 3px solid #ff6b35;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .form-section h2 i { color: #ff6b35; font-size: 1.5rem; }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 25px;
+        margin-bottom: 25px;
+    }
+
+    .form-row .full-width { grid-column: 1 / -1; }
+
+    .form-group { margin-bottom: 25px; }
+
+    .form-group label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #2a5298;
+        font-weight: 600;
+        margin-bottom: 10px;
+        font-size: 1.05rem;
+    }
+
+    .form-group label i { color: #ff6b35; width: 20px; text-align: center; }
+
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 16px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        color: #333;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: #ff6b35;
+        background: white;
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.15);
+    }
+
+    /* Divider */
+    .divider {
+        position: relative;
+        text-align: center;
+        margin: 40px 0;
+        padding: 20px 0;
+    }
+
+    .divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, #ff6b35 50%, transparent 100%);
+        z-index: 1;
+    }
+
+    .divider span {
+        background: white;
+        padding: 0 20px;
+        position: relative;
+        z-index: 2;
+        color: #2a5298;
+        font-weight: 600;
+        font-size: 1.2rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .divider i { color: #ff6b35; }
+
+    /* Submit Button */
+    .form-actions { margin-top: 40px; text-align: center; }
+
+    .btn-reservar-grande {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        background: linear-gradient(135deg, #ff6b35, #ff8533);
+        color: white;
+        padding: 20px 50px;
+        border-radius: 60px;
+        font-weight: 700;
+        font-size: 1.4rem;
+        transition: all 0.4s ease;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        min-width: 300px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .btn-reservar-grande:hover {
+        background: linear-gradient(135deg, #ff8533, #ff6b35);
+        transform: translateY(-5px) scale(1.05);
+        box-shadow: 0 20px 40px rgba(255, 107, 53, 0.6);
+    }
+
+    .btn-reservar-grande:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+    /* Summary Column */
+    .summary-column { position: sticky; top: 100px; height: fit-content; }
+
+    .reservation-summary {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 2px solid #ff6b35;
+    }
+
+    .reservation-summary h3 {
+        background: linear-gradient(135deg, #2a5298, #1e3c72);
+        color: white;
+        padding: 25px;
+        margin: 0;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .summary-details { padding: 25px; }
+
+    .summary-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 0;
+        border-bottom: 1px solid #f0f0f0;
+    }
+
+    .summary-item span:first-child { color: #2a5298; font-weight: 600; }
+    .summary-item span:last-child  { color: #333; font-weight: 500; }
+
+    .summary-divider {
+        height: 2px;
+        background: linear-gradient(90deg, transparent 0%, #ff6b35 50%, transparent 100%);
+        margin: 20px 0;
+    }
+
+    .summary-info {
+        padding: 25px;
+        background: #f8f9fa;
+        border-top: 1px solid #e0e0e0;
+    }
+
+    .summary-info h4 {
+        color: #2a5298;
+        font-size: 1.2rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .summary-info h4 i { color: #ff6b35; }
+
+    .summary-info ul { list-style: none; padding: 0; margin: 0; }
+
+    .summary-info li {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 10px;
+        color: #333;
+        font-size: 0.95rem;
+    }
+
+    .summary-info li i { color: #28a745; font-size: 0.9rem; }
+
+    /* Responsive */
+    @media (max-width: 992px) {
+        .reservation-container { grid-template-columns: 1fr; gap: 30px; }
+        .summary-column { position: static; }
+    }
+
+    @media (max-width: 768px) {
+        .form-row { grid-template-columns: 1fr; }
+        .form-section { padding: 30px; }
+    }
+
+    /* ====== DARK MODE — RESERVAS ====== */
+    body.dark-mode .reservation-section {
+        background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+    }
+
+    body.dark-mode .form-column {
+        background: #1e1e1e;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode .form-section h2 { color: #90b4f5; border-color: #ff6b35; }
+
+    body.dark-mode .form-group label { color: #90b4f5; }
+
+    body.dark-mode .form-group input,
+    body.dark-mode .form-group select {
+        background: #2a2a2a !important;
+        color: #e0e0e0 !important;
+        border-color: #444 !important;
+    }
+
+    body.dark-mode .form-group input:focus,
+    body.dark-mode .form-group select:focus {
+        background: #333 !important;
+        border-color: #ff6b35 !important;
+        box-shadow: 0 0 0 4px rgba(255, 107, 53, 0.2) !important;
+    }
+
+    body.dark-mode .form-group input::placeholder { color: #666 !important; }
+
+    body.dark-mode .form-group select option {
+        background: #2a2a2a;
+        color: #e0e0e0;
+    }
+
+    body.dark-mode .divider span {
+        background: #1e1e1e;
+        color: #90b4f5;
+    }
+
+    body.dark-mode .reservation-summary {
+        background: #1e1e1e;
+        border-color: #ff6b35;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    body.dark-mode .summary-item { border-color: #2a2a2a; }
+    body.dark-mode .summary-item span:first-child { color: #90b4f5; }
+    body.dark-mode .summary-item span:last-child  { color: #e0e0e0; }
+
+    /* Seña (fondo amarillo hardcodeado en el HTML inline) */
+    body.dark-mode [style*="fff3cd"] {
+        background: #3a3000 !important;
+    }
+    body.dark-mode [style*="856404"] { color: #ffd85a !important; }
+
+    /* Total (color azul inline) */
+    body.dark-mode #summary-total { color: #90b4f5 !important; }
+    body.dark-mode #summary-saldo { color: #ff8c5a !important; }
+
+    body.dark-mode .summary-info {
+        background: #252525;
+        border-color: #333;
+    }
+
+    body.dark-mode .summary-info h4  { color: #90b4f5; }
+    body.dark-mode .summary-info li  { color: #cccccc; }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header">
+    <div class="container">
+        <h1>Reservar Cancha</h1>
+        <p>Completa el formulario para reservar tu cancha preferida</p>
+    </div>
+</section>
+
+<!-- Reservation Form -->
+<section class="reservation-section">
+    <div class="container">
+        <div class="reservation-container">
+            <!-- Form Column -->
+            <div class="form-column">
+                <div class="form-section">
+                    <h2><i class="fas fa-user-circle"></i> Información Personal</h2>
+
+                    <form id="reservationForm">
+                        <div class="form-row">
+                            <div class="form-group full-width">
+                                <label for="nombre_completo">
+                                    <i class="fas fa-user"></i> Nombre Completo *
+                                </label>
+                                <input type="text" id="nombre_completo" name="nombre_completo" required
+                                       placeholder="Ingresa tu nombre completo">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="email">
+                                    <i class="fas fa-envelope"></i> Email *
+                                </label>
+                                <input type="email" id="email" name="email" required
+                                       placeholder="ejemplo@correo.com">
+                            </div>
+                            <div class="form-group">
+                                <label for="telefono">
+                                    <i class="fas fa-phone"></i> Teléfono *
+                                </label>
+                                <input type="tel" id="telefono" name="telefono" required
+                                       placeholder="1123456789">
+                            </div>
+                        </div>
+
+                        <div class="divider">
+                            <span><i class="fas fa-futbol"></i> Detalles de la Reserva</span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cancha">
+                                    <i class="fas fa-map-marker-alt"></i> Cancha *
+                                </label>
+                                <select id="cancha" name="cancha" required>
+                                    <option value="">Seleccionar cancha</option>
+                                    <option value="1">Cancha 1</option>
+                                    <option value="2">Cancha 2</option>
+                                    <option value="3">Cancha 3</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="fecha">
+                                    <i class="fas fa-calendar-alt"></i> Fecha *
+                                </label>
+                                <input type="date" id="fecha" name="fecha" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="hora">
+                                    <i class="fas fa-clock"></i> Horario de inicio *
+                                </label>
+                                <select id="hora" name="hora" required>
+                                    <option value="">Seleccionar horario</option>
+                                    <option value="14:00-15:00">14:00 - 15:00</option>
+                                    <option value="15:00-16:00">15:00 - 16:00</option>
+                                    <option value="16:00-17:00">16:00 - 17:00</option>
+                                    <option value="17:00-18:00">17:00 - 18:00</option>
+                                    <option value="18:00-19:00">18:00 - 19:00</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="duracion">
+                                    <i class="fas fa-hourglass-half"></i> Duración *
+                                </label>
+                                <select id="duracion" name="duracion" required>
+                                    <option value="">Seleccionar duración</option>
+                                    <option value="1">1 hora - $20,000</option>
+                                    <option value="1.5">1.5 horas - $30,000</option>
+                                    <option value="2">2 horas - $40,000</option>
+                                    <option value="2.5">2.5 horas - $50,000</option>
+                                    <option value="3">3 horas - $60,000</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn-reservar-grande">
+                                <i class="fas fa-check-circle"></i>
+                                <span>IR A PAGAR SEÑA (15%)</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Summary Column -->
+            <div class="summary-column">
+                <div class="reservation-summary">
+                    <h3><i class="fas fa-receipt"></i> Resumen de la Reserva</h3>
+
+                    <div class="summary-details">
+                        <div class="summary-item">
+                            <span>Cancha:</span>
+                            <span id="summary-cancha">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Fecha:</span>
+                            <span id="summary-fecha">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Horario:</span>
+                            <span id="summary-hora">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Duración:</span>
+                            <span id="summary-duracion">-</span>
+                        </div>
+                        <div class="summary-item">
+                            <span>Precio por hora:</span>
+                            <span>$20,000</span>
+                        </div>
+
+                        <div class="summary-divider"></div>
+
+                        <div class="summary-item summary-total-row">
+                            <span class="summary-label-total">Total:</span>
+                            <span id="summary-total" class="summary-value-total">$0</span>
+                        </div>
+
+                        <div class="summary-item summary-sena-row">
+                            <span class="summary-label-sena">Seña a pagar (15%):</span>
+                            <span id="summary-seña" class="summary-value-sena">$0</span>
+                        </div>
+
+                        <div class="summary-item">
+                            <span>Saldo pendiente:</span>
+                            <span id="summary-saldo" class="summary-value-saldo">$0</span>
+                        </div>
+                    </div>
+
+                    <div class="summary-info">
+                        <h4><i class="fas fa-info-circle"></i> Información Importante</h4>
+                        <ul>
+                            <li><i class="fas fa-check-circle"></i> Pagás solo el 15% de seña ahora</li>
+                            <li><i class="fas fa-check-circle"></i> El resto se paga el día de la reserva</li>
+                            <li><i class="fas fa-check-circle"></i> Recibirás un PDF por email</li>
+                            <li><i class="fas fa-check-circle"></i> Presentarse 15 minutos antes</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Estilos inline reemplazados por clases */
+    .summary-total-row  { font-size: 1.2rem; }
+    .summary-label-total, .summary-value-total { font-weight: bold; }
+    .summary-value-total { color: #2a5298; }
+
+    .summary-sena-row   { background: #fff3cd; padding: 10px; border-radius: 8px; margin-top: 10px; }
+    .summary-label-sena { color: #856404; }
+    .summary-value-sena { color: #856404; font-weight: bold; }
+
+    .summary-value-saldo { color: #ff6b35; }
+
+    /* Dark mode para estos elementos */
+    body.dark-mode .summary-value-total  { color: #90b4f5 !important; }
+    body.dark-mode .summary-sena-row     { background: #3a3000 !important; }
+    body.dark-mode .summary-label-sena,
+    body.dark-mode .summary-value-sena   { color: #ffd85a !important; }
+    body.dark-mode .summary-value-saldo  { color: #ff8c5a !important; }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const form          = document.getElementById('reservationForm');
+        const canchaSelect  = document.getElementById('cancha');
+        const fechaInput    = document.getElementById('fecha');
+        const horaSelect    = document.getElementById('hora');
+        const duracionSelect = document.getElementById('duracion');
+
+        const summaryCancha  = document.getElementById('summary-cancha');
+        const summaryFecha   = document.getElementById('summary-fecha');
+        const summaryHora    = document.getElementById('summary-hora');
+        const summaryDuracion = document.getElementById('summary-duracion');
+        const summaryTotal   = document.getElementById('summary-total');
+        const summarySeña    = document.getElementById('summary-seña');
+        const summarySaldo   = document.getElementById('summary-saldo');
+
+        fechaInput.min = new Date().toISOString().split('T')[0];
+
+        function calcularPrecios() {
+            const duracion = parseFloat(duracionSelect.value) || 0;
+            const total = duracion * 20000;
+            return { total, seña: total * 0.15, saldo: total * 0.85 };
+        }
+
+        function updateSummary() {
+            summaryCancha.textContent   = canchaSelect.value ? `Cancha ${canchaSelect.value}` : '-';
+            summaryFecha.textContent    = fechaInput.value || '-';
+            summaryHora.textContent     = horaSelect.value || '-';
+            const durText = duracionSelect.options[duracionSelect.selectedIndex]?.text || '-';
+            summaryDuracion.textContent = duracionSelect.value ? durText.split(' - ')[0] : '-';
+
+            if (duracionSelect.value) {
+                const { total, seña, saldo } = calcularPrecios();
+                summaryTotal.textContent = `$${total.toLocaleString('es-AR')}`;
+                summarySeña.textContent  = `$${seña.toLocaleString('es-AR')}`;
+                summarySaldo.textContent = `$${saldo.toLocaleString('es-AR')}`;
+            } else {
+                summaryTotal.textContent = '$0';
+                summarySeña.textContent  = '$0';
+                summarySaldo.textContent = '$0';
+            }
+        }
+
+        canchaSelect.addEventListener('change', updateSummary);
+        fechaInput.addEventListener('change', updateSummary);
+        horaSelect.addEventListener('change', updateSummary);
+        duracionSelect.addEventListener('change', updateSummary);
+
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const nombre   = document.getElementById('nombre_completo').value.trim();
+            const email    = document.getElementById('email').value.trim();
+            const telefono = document.getElementById('telefono').value.trim();
+            const cancha   = canchaSelect.value;
+            const fecha    = fechaInput.value;
+            const hora     = horaSelect.value;
+            const duracion = duracionSelect.value;
+
+            if (!nombre || !email || !telefono || !cancha || !fecha || !hora || !duracion) {
+                alert('❌ Por favor completá todos los campos obligatorios');
+                return;
+            }
+
+            const submitBtn = form.querySelector('.btn-reservar-grande');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i><span>PROCESANDO...</span>';
+
+            fetch('/reservar/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCookie('csrftoken') },
+                body: JSON.stringify({ nombre, email, telefono, cancha, fecha, hora, duracion: parseFloat(duracion) })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success && data.init_point) {
+                    alert('✅ Redirigiendo a MercadoPago para pagar la seña...');
+                    window.location.href = data.init_point;
+                } else {
+                    alert('❌ ' + data.message);
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>IR A PAGAR SEÑA (15%)</span>';
+                }
+            })
+            .catch(() => {
+                alert('❌ Error al procesar la reserva');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check-circle"></i><span>IR A PAGAR SEÑA (15%)</span>';
+            });
+        });
+
+        updateSummary();
+    });
+</script>
+{% endblock %}
